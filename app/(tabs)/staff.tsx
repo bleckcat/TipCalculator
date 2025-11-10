@@ -6,6 +6,7 @@ import {
   Alert,
   FlatList,
   Modal,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -21,7 +22,8 @@ export default function StaffScreen() {
   const [formData, setFormData] = useState({
     name: '',
     roleId: '',
-    customPercentage: '100',
+    lunchShift: '100',
+    dinnerShift: '100',
   });
 
   const roles = getRoles();
@@ -32,14 +34,16 @@ export default function StaffScreen() {
       setFormData({
         name: staff.name,
         roleId: staff.role.id,
-        customPercentage: staff.customPercentage.toString(),
+        lunchShift: staff.lunchShift.toString(),
+        dinnerShift: staff.dinnerShift.toString(),
       });
     } else {
       setEditingStaff(null);
       setFormData({
         name: '',
         roleId: roles[0]?.id || '',
-        customPercentage: '100',
+        lunchShift: '100',
+        dinnerShift: '100',
       });
     }
     setModalVisible(true);
@@ -62,9 +66,16 @@ export default function StaffScreen() {
       return;
     }
 
-    const customPercentage = parseFloat(formData.customPercentage);
-    if (isNaN(customPercentage) || customPercentage <= 0) {
-      Alert.alert('Error', 'Please enter a valid percentage');
+    const lunchShift = parseFloat(formData.lunchShift);
+    const dinnerShift = parseFloat(formData.dinnerShift);
+    
+    if (isNaN(lunchShift) || lunchShift < 0 || lunchShift > 100) {
+      Alert.alert('Error', 'Lunch shift must be between 0% and 100%');
+      return;
+    }
+    
+    if (isNaN(dinnerShift) || dinnerShift < 0 || dinnerShift > 100) {
+      Alert.alert('Error', 'Dinner shift must be between 0% and 100%');
       return;
     }
 
@@ -72,7 +83,8 @@ export default function StaffScreen() {
       id: editingStaff?.id || Date.now().toString(),
       name: formData.name.trim(),
       role: selectedRole,
-      customPercentage,
+      lunchShift,
+      dinnerShift,
       isActive: true,
     };
 
@@ -101,7 +113,10 @@ export default function StaffScreen() {
       <View style={styles.staffInfo}>
         <Text style={styles.staffName}>{item.name}</Text>
         <Text style={styles.staffRole}>
-          {item.role.name} • {item.customPercentage}% shift
+          {item.role.name}
+        </Text>
+        <Text style={styles.staffRole}>
+          Lunch: {item.lunchShift}% • Dinner: {item.dinnerShift}%
         </Text>
       </View>
       <View style={styles.staffActions}>
@@ -176,7 +191,7 @@ export default function StaffScreen() {
             </TouchableOpacity>
           </View>
 
-          <View style={styles.modalContent}>
+          <ScrollView style={styles.modalContent} contentContainerStyle={styles.modalContentContainer}>
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Name</Text>
               <TextInput
@@ -196,19 +211,47 @@ export default function StaffScreen() {
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Shift Percentage</Text>
-              <TextInput
-                style={styles.textInput}
-                value={formData.customPercentage}
-                onChangeText={customPercentage => setFormData({ ...formData, customPercentage })}
-                placeholder="100"
-                keyboardType="numeric"
-              />
+              <Text style={styles.label}>Shift Percentages</Text>
+              <View style={styles.shiftInputRow}>
+                <View style={styles.shiftInputContainer}>
+                  <Text style={styles.shiftInputLabel}>Lunch</Text>
+                  <TextInput
+                    style={[
+                      styles.shiftInput,
+                      parseFloat(formData.lunchShift) > 100 && styles.shiftInputError,
+                    ]}
+                    value={formData.lunchShift}
+                    onChangeText={lunchShift => setFormData({ ...formData, lunchShift })}
+                    placeholder="100"
+                    keyboardType="numeric"
+                    placeholderTextColor="#666666"
+                  />
+                </View>
+                <View style={styles.shiftInputContainer}>
+                  <Text style={styles.shiftInputLabel}>Dinner</Text>
+                  <TextInput
+                    style={[
+                      styles.shiftInput,
+                      parseFloat(formData.dinnerShift) > 100 && styles.shiftInputError,
+                    ]}
+                    value={formData.dinnerShift}
+                    onChangeText={dinnerShift => setFormData({ ...formData, dinnerShift })}
+                    placeholder="100"
+                    keyboardType="numeric"
+                    placeholderTextColor="#666666"
+                  />
+                </View>
+              </View>
+              {(parseFloat(formData.lunchShift) > 100 || parseFloat(formData.dinnerShift) > 100) && (
+                <Text style={styles.errorText}>
+                  Shift percentage cannot exceed 100%
+                </Text>
+              )}
               <Text style={styles.helperText}>
-                100% = full shift, 50% = half shift, 150% = overtime
+                100% = full shift, 50% = half shift
               </Text>
             </View>
-          </View>
+          </ScrollView>
         </SafeAreaView>
       </Modal>
     </SafeAreaView>
@@ -352,8 +395,11 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     flex: 1,
+  },
+  modalContentContainer: {
     paddingHorizontal: 20,
     paddingTop: 20,
+    paddingBottom: 40,
   },
   inputGroup: {
     marginBottom: 25,
@@ -373,6 +419,40 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     fontSize: 16,
     color: AppColors.text,
+  },
+  shiftInputRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  shiftInputContainer: {
+    flex: 1,
+  },
+  shiftInputLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: AppColors.textSecondary,
+    marginBottom: 8,
+  },
+  shiftInput: {
+    backgroundColor: AppColors.background,
+    borderWidth: 2,
+    borderColor: AppColors.border,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: AppColors.text,
+    textAlign: 'center',
+  },
+  shiftInputError: {
+    borderColor: AppColors.error,
+    borderWidth: 2,
+  },
+  errorText: {
+    fontSize: 12,
+    color: AppColors.error,
+    marginTop: 6,
+    fontWeight: '600',
   },
   helperText: {
     fontSize: 12,

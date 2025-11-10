@@ -2,7 +2,8 @@ export interface Staff {
   id: string;
   name: string;
   role: StaffRole;
-  customPercentage: number; // Modifier percentage (default 100 = full shift)
+  lunchShift: number; // Lunch shift percentage (default 100 = full shift)
+  dinnerShift: number; // Dinner shift percentage (default 100 = full shift)
   isActive: boolean;
 }
 
@@ -16,6 +17,7 @@ export interface StaffRole {
 export interface TipCalculation {
   id: string;
   date: string;
+  mealPeriod: 'lunch' | 'dinner'; // Which meal period this calculation is for
   totalTipAmount: number;
   staffMembers: CalculationStaff[];
   adjustedPercentages: boolean; // No longer used but kept for compatibility

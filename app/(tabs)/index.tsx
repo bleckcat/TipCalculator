@@ -17,19 +17,21 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 export default function CalculateTipScreen() {
   const { state, addTipCalculation } = useApp();
   const [totalAmount, setTotalAmount] = useState('');
+  const [mealPeriod, setMealPeriod] = useState<'lunch' | 'dinner'>('dinner');
   const [selectedStaff, setSelectedStaff] = useState<Staff[]>([]);
   const [calculationResult, setCalculationResult] = useState<{
     calculationStaff: CalculationStaff[];
     adjustedPercentages: boolean;
     totalPercentage: number;
     undistributedAmount: number;
+    shiftAdjustments: {staffId: string, oldShift: number, newShift: number}[];
   } | null>(null);
 
   useEffect(() => {
     if (totalAmount && selectedStaff.length > 0) {
       const amount = parseFloat(totalAmount);
       if (!isNaN(amount) && amount > 0) {
-        const result = calculateTips(amount, selectedStaff);
+        const result = calculateTips(amount, selectedStaff, mealPeriod);
         setCalculationResult(result);
       } else {
         setCalculationResult(null);
@@ -37,7 +39,7 @@ export default function CalculateTipScreen() {
     } else {
       setCalculationResult(null);
     }
-  }, [totalAmount, selectedStaff]);
+  }, [totalAmount, selectedStaff, mealPeriod]);
 
   const toggleStaffSelection = (staff: Staff) => {
     setSelectedStaff(prev => {
@@ -59,6 +61,7 @@ export default function CalculateTipScreen() {
     const calculation = {
       id: generateTipCalculationId(),
       date: new Date().toISOString(),
+      mealPeriod,
       totalTipAmount: parseFloat(totalAmount),
       staffMembers: calculationResult.calculationStaff,
       adjustedPercentages: calculationResult.adjustedPercentages,
@@ -71,12 +74,13 @@ export default function CalculateTipScreen() {
     setTotalAmount('');
     setSelectedStaff([]);
     setCalculationResult(null);
-
+    
     Alert.alert('Success', 'Tip calculation saved successfully!');
   };
 
   const renderStaffItem = ({ item }: { item: Staff }) => {
     const isSelected = selectedStaff.find(s => s.id === item.id);
+    const currentShift = mealPeriod === 'lunch' ? item.lunchShift : item.dinnerShift;
     
     return (
       <TouchableOpacity
@@ -92,7 +96,7 @@ export default function CalculateTipScreen() {
             {item.name}
           </Text>
           <Text style={[styles.staffRole, isSelected && styles.selectedText]}>
-            {item.role.name} • {item.customPercentage}% shift
+            {item.role.name} • {currentShift}% {mealPeriod}
           </Text>
         </View>
         <View style={[styles.roleIndicator, { backgroundColor: item.role.color }]} />
@@ -109,10 +113,7 @@ export default function CalculateTipScreen() {
       <View style={styles.calculationInfo}>
         <Text style={styles.calculationName}>{item.staffName}</Text>
         <Text style={styles.calculationRole}>
-          {item.role.name} • {item.pool === 'pool1' ? '97% Pool' : '3% Pool'}
-        </Text>
-        <Text style={styles.calculationPercentage}>
-          {item.customPercentage}% shift
+          {item.role.name} • {item.customPercentage}% shift
         </Text>
       </View>
       <Text style={styles.calculationAmount}>
@@ -126,6 +127,40 @@ export default function CalculateTipScreen() {
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
           <Text style={styles.title}>Calculate Tips</Text>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Meal Period</Text>
+          <View style={styles.mealPeriodContainer}>
+            <TouchableOpacity
+              style={[
+                styles.mealPeriodButton,
+                mealPeriod === 'lunch' && styles.mealPeriodButtonActive,
+              ]}
+              onPress={() => setMealPeriod('lunch')}
+            >
+              <Text style={[
+                styles.mealPeriodText,
+                mealPeriod === 'lunch' && styles.mealPeriodTextActive,
+              ]}>
+                Lunch
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.mealPeriodButton,
+                mealPeriod === 'dinner' && styles.mealPeriodButtonActive,
+              ]}
+              onPress={() => setMealPeriod('dinner')}
+            >
+              <Text style={[
+                styles.mealPeriodText,
+                mealPeriod === 'dinner' && styles.mealPeriodTextActive,
+              ]}>
+                Dinner
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         <View style={styles.section}>
@@ -162,9 +197,40 @@ export default function CalculateTipScreen() {
               <Text style={styles.sectionTitle}>Calculation Results</Text>
             </View>
 
-            <View style={styles.calculationList}>
-              {calculationResult.calculationStaff.map((item) => renderCalculationItem({ item }))}
-            </View>
+            {/* Pool 1 - 97% */}
+            {calculationResult.calculationStaff.filter(s => s.pool === 'pool1').length > 0 && (
+              <>
+                <View style={styles.poolHeader}>
+                  <Text style={styles.poolTitle}>Pool 1 (97%)</Text>
+                  <Text style={styles.poolAmount}>
+                    {formatCurrency(parseFloat(totalAmount) * 0.97)}
+                  </Text>
+                </View>
+                <View style={styles.calculationList}>
+                  {calculationResult.calculationStaff
+                    .filter(s => s.pool === 'pool1')
+                    .map((item) => renderCalculationItem({ item }))}
+                </View>
+              </>
+            )}
+
+            {/* Pool 2 - 3% */}
+            {calculationResult.calculationStaff.filter(s => s.pool === 'pool2').length > 0 && (
+              <>
+                <View style={styles.poolDivider} />
+                <View style={styles.poolHeader}>
+                  <Text style={styles.poolTitle}>Pool 2 (3%)</Text>
+                  <Text style={styles.poolAmount}>
+                    {formatCurrency(parseFloat(totalAmount) * 0.03)}
+                  </Text>
+                </View>
+                <View style={styles.calculationList}>
+                  {calculationResult.calculationStaff
+                    .filter(s => s.pool === 'pool2')
+                    .map((item) => renderCalculationItem({ item }))}
+                </View>
+              </>
+            )}
 
             <View style={styles.totalRow}>
               <Text style={styles.totalLabel}>Total Distributed:</Text>
@@ -235,6 +301,54 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: AppColors.text,
     marginBottom: 15,
+  },
+  mealPeriodContainer: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  mealPeriodButton: {
+    flex: 1,
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: AppColors.border,
+    backgroundColor: AppColors.background,
+    alignItems: 'center',
+  },
+  mealPeriodButtonActive: {
+    borderColor: AppColors.primary,
+    backgroundColor: AppColors.primary,
+  },
+  mealPeriodText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: AppColors.textSecondary,
+  },
+  mealPeriodTextActive: {
+    color: AppColors.background,
+  },
+  poolHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 10,
+    marginBottom: 12,
+  },
+  poolTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: AppColors.textSecondary,
+  },
+  poolAmount: {
+    fontSize: 12,
+    color: AppColors.textMuted,
+    fontWeight: '500',
+  },
+  poolDivider: {
+    height: 1,
+    backgroundColor: AppColors.border,
+    marginVertical: 20,
   },
   amountInput: {
     backgroundColor: AppColors.background,
