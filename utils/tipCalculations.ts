@@ -81,6 +81,8 @@ export function calculateTips(
   totalPercentage: number;
   undistributedAmount: number;
   shiftAdjustments: {staffId: string, oldShift: number, newShift: number}[];
+  pool2BaseAmount: number;
+  pool2ExtraAmount: number;
 } {
   if (selectedStaff.length === 0) {
     return {
@@ -89,6 +91,8 @@ export function calculateTips(
       totalPercentage: 0,
       undistributedAmount: 0,
       shiftAdjustments: [],
+      pool2BaseAmount: 0,
+      pool2ExtraAmount: 0,
     };
   }
 
@@ -108,6 +112,7 @@ export function calculateTips(
 
   const calculationStaff: CalculationStaff[] = [];
   let totalDistributed = 0;
+  let pool2TotalDistributed = 0;
 
   // Process Pool 1 (97%)
   if (pool1Redistributed.length > 0) {
@@ -154,10 +159,14 @@ export function calculateTips(
       });
       
       totalDistributed += roundedAmount;
+      pool2TotalDistributed += roundedAmount;
     });
   }
 
   const undistributedAmount = Math.max(0, totalAmount - totalDistributed);
+  
+  // Calculate pool 2 extra amount (due to rounding up)
+  const pool2ExtraAmount = pool2TotalDistributed > 0 ? pool2TotalDistributed - pool2Amount : 0;
 
   return {
     calculationStaff,
@@ -165,6 +174,8 @@ export function calculateTips(
     totalPercentage: 100,
     undistributedAmount,
     shiftAdjustments: [], // No longer needed since shifts are capped at 100%
+    pool2BaseAmount: pool2Amount,
+    pool2ExtraAmount,
   };
 }
 

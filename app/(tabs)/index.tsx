@@ -25,6 +25,8 @@ export default function CalculateTipScreen() {
     totalPercentage: number;
     undistributedAmount: number;
     shiftAdjustments: {staffId: string, oldShift: number, newShift: number}[];
+    pool2BaseAmount: number;
+    pool2ExtraAmount: number;
   } | null>(null);
 
   // Get actual staff objects from context using IDs (always up-to-date)
@@ -226,9 +228,16 @@ export default function CalculateTipScreen() {
                 <View style={styles.poolHeader}>
                   <Text style={styles.poolTitle}>Pool 2 (3%)</Text>
                   <Text style={styles.poolAmount}>
-                    {formatCurrency(parseFloat(totalAmount) * 0.03)}
+                    {formatCurrency(calculationResult.pool2BaseAmount)}
                   </Text>
                 </View>
+                {calculationResult.pool2ExtraAmount > 0 && (
+                  <View style={styles.pool2ExtraInfo}>
+                    <Text style={styles.pool2ExtraText}>
+                      Extra added (rounded up): {formatCurrency(calculationResult.pool2ExtraAmount)}
+                    </Text>
+                  </View>
+                )}
                 <View style={styles.calculationList}>
                   {calculationResult.calculationStaff
                     .filter(s => s.pool === 'pool2')
@@ -354,6 +363,20 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: AppColors.border,
     marginVertical: 20,
+  },
+  pool2ExtraInfo: {
+    backgroundColor: AppColors.background,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    marginBottom: 12,
+    borderLeftWidth: 3,
+    borderLeftColor: AppColors.primary,
+  },
+  pool2ExtraText: {
+    fontSize: 12,
+    color: AppColors.primary,
+    fontWeight: '600',
   },
   amountInput: {
     backgroundColor: AppColors.background,
