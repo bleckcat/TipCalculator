@@ -1,98 +1,427 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { useApp } from '@/context/AppContext';
+import { CalculationStaff, Staff } from '@/types';
+import { calculateTips, formatCurrency, formatPercentage, generateTipCalculationId } from '@/utils/tipCalculations';
+import React, { useEffect, useState } from 'react';
+import {
+  Alert,
+  FlatList,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+export default function CalculateTipScreen() {
+  const { state, addTipCalculation } = useApp();
+  const [totalAmount, setTotalAmount] = useState('');
+  const [selectedStaff, setSelectedStaff] = useState<Staff[]>([]);
+  const [calculationResult, setCalculationResult] = useState<{
+    calculationStaff: CalculationStaff[];
+    adjustedPercentages: boolean;
+    totalPercentage: number;
+  } | null>(null);
 
-export default function HomeScreen() {
+  useEffect(() => {
+    if (totalAmount && selectedStaff.length > 0) {
+      const amount = parseFloat(totalAmount);
+      if (!isNaN(amount) && amount > 0) {
+        const result = calculateTips(amount, selectedStaff);
+        setCalculationResult(result);
+      } else {
+        setCalculationResult(null);
+      }
+    } else {
+      setCalculationResult(null);
+    }
+  }, [totalAmount, selectedStaff]);
+
+  const toggleStaffSelection = (staff: Staff) => {
+    setSelectedStaff(prev => {
+      const isSelected = prev.find(s => s.id === staff.id);
+      if (isSelected) {
+        return prev.filter(s => s.id !== staff.id);
+      } else {
+        return [...prev, staff];
+      }
+    });
+  };
+
+  const handleSaveCalculation = () => {
+    if (!calculationResult || !totalAmount) {
+      Alert.alert('Error', 'Please complete the calculation first');
+      return;
+    }
+
+    const calculation = {
+      id: generateTipCalculationId(),
+      date: new Date().toISOString(),
+      totalTipAmount: parseFloat(totalAmount),
+      staffMembers: calculationResult.calculationStaff,
+      adjustedPercentages: calculationResult.adjustedPercentages,
+    };
+
+    addTipCalculation(calculation);
+    
+    // Reset form
+    setTotalAmount('');
+    setSelectedStaff([]);
+    setCalculationResult(null);
+
+    Alert.alert('Success', 'Tip calculation saved successfully!');
+  };
+
+  const renderStaffItem = ({ item }: { item: Staff }) => {
+    const isSelected = selectedStaff.find(s => s.id === item.id);
+    
+    return (
+      <TouchableOpacity
+        style={[
+          styles.staffItem,
+          isSelected && styles.selectedStaffItem,
+        ]}
+        onPress={() => toggleStaffSelection(item)}
+      >
+        <View style={styles.staffInfo}>
+          <Text style={[styles.staffName, isSelected && styles.selectedText]}>
+            {item.name}
+          </Text>
+          <Text style={[styles.staffRole, isSelected && styles.selectedText]}>
+            {item.role.name} • {item.customPercentage}% shift
+          </Text>
+          <Text style={[styles.basePercentage, isSelected && styles.selectedText]}>
+            Base: {item.role.basePercentage}% tip
+          </Text>
+        </View>
+        <View style={[styles.roleIndicator, { backgroundColor: item.role.color }]} />
+      </TouchableOpacity>
+    );
+  };
+
+  const renderCalculationItem = ({ item }: { item: CalculationStaff }) => (
+    <View style={[
+      styles.calculationItem,
+      calculationResult?.adjustedPercentages && styles.adjustedItem,
+    ]}>
+      <View style={styles.calculationInfo}>
+        <Text style={styles.calculationName}>{item.staffName}</Text>
+        <Text style={styles.calculationRole}>{item.role.name}</Text>
+        <Text style={[
+          styles.calculationPercentage,
+          calculationResult?.adjustedPercentages && styles.adjustedText,
+        ]}>
+          {formatPercentage(item.calculatedPercentage)}
+          {calculationResult?.adjustedPercentages && ' (adjusted)'}
+        </Text>
+      </View>
+      <Text style={[
+        styles.calculationAmount,
+        calculationResult?.adjustedPercentages && styles.adjustedText,
+      ]}>
+        {formatCurrency(item.tipAmount)}
+      </Text>
+    </View>
+  );
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+    <SafeAreaView style={styles.container}>
+      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+        <View style={styles.header}>
+          <Text style={styles.title}>Calculate Tips</Text>
+        </View>
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Total Tip Amount</Text>
+          <TextInput
+            style={styles.amountInput}
+            value={totalAmount}
+            onChangeText={setTotalAmount}
+            placeholder="Enter total cash tips"
+            keyboardType="numeric"
+          />
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>
+            Select Staff ({selectedStaff.length} selected)
+          </Text>
+          {state.staff.length === 0 ? (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyText}>No staff members available</Text>
+              <Text style={styles.emptySubtext}>Go to Staff tab to add team members</Text>
+            </View>
+          ) : (
+            <FlatList
+              data={state.staff}
+              renderItem={renderStaffItem}
+              keyExtractor={item => item.id}
+              style={styles.staffList}
+              nestedScrollEnabled={true}
+            />
+          )}
+        </View>
+
+        {calculationResult && (
+          <View style={styles.section}>
+            <View style={styles.calculationHeader}>
+              <Text style={styles.sectionTitle}>Calculation Results</Text>
+              {calculationResult.adjustedPercentages && (
+                <View style={styles.warningBadge}>
+                  <Text style={styles.warningText}>ADJUSTED</Text>
+                </View>
+              )}
+            </View>
+            
+            {calculationResult.adjustedPercentages && (
+              <View style={styles.warningMessage}>
+                <Text style={styles.warningMessageText}>
+                  Total percentages exceeded 100%. Values have been adjusted proportionally.
+                </Text>
+              </View>
+            )}
+
+            <FlatList
+              data={calculationResult.calculationStaff}
+              renderItem={renderCalculationItem}
+              keyExtractor={item => item.staffId}
+              style={styles.calculationList}
+              nestedScrollEnabled={true}
+            />
+
+            <View style={styles.totalRow}>
+              <Text style={styles.totalLabel}>Total Distributed:</Text>
+              <Text style={styles.totalAmount}>
+                {formatCurrency(
+                  calculationResult.calculationStaff.reduce(
+                    (sum, item) => sum + item.tipAmount, 0
+                  )
+                )}
+              </Text>
+            </View>
+
+            <TouchableOpacity
+              style={styles.saveButton}
+              onPress={handleSaveCalculation}
+            >
+              <Text style={styles.saveButtonText}>Save Calculation</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
   },
-  stepContainer: {
-    gap: 8,
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: 100, // Add bottom padding to prevent overlap with tab bar
+  },
+  header: {
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  section: {
+    backgroundColor: '#fff',
+    marginTop: 10,
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 15,
+  },
+  amountInput: {
+    backgroundColor: '#f8f8f8',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    paddingHorizontal: 15,
+    paddingVertical: 15,
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#333',
+  },
+  staffList: {
+    // Removed maxHeight to show all staff members
+  },
+  staffItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 15,
+    marginBottom: 8,
+    backgroundColor: '#f8f8f8',
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: 'transparent',
+  },
+  selectedStaffItem: {
+    backgroundColor: '#e3f2fd',
+    borderColor: '#2196F3',
+  },
+  staffInfo: {
+    flex: 1,
+  },
+  staffName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 4,
+  },
+  staffRole: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 2,
+  },
+  basePercentage: {
+    fontSize: 12,
+    color: '#999',
+  },
+  selectedText: {
+    color: '#1976D2',
+  },
+  roleIndicator: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    marginLeft: 10,
+  },
+  emptyState: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 30,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#666',
     marginBottom: 8,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  emptySubtext: {
+    fontSize: 14,
+    color: '#999',
+  },
+  calculationHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  warningBadge: {
+    backgroundColor: '#ff9800',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+  },
+  warningText: {
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: 'bold',
+  },
+  warningMessage: {
+    backgroundColor: '#fff3cd',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 15,
+    borderWidth: 1,
+    borderColor: '#ffeaa7',
+  },
+  warningMessageText: {
+    color: '#856404',
+    fontSize: 14,
+  },
+  calculationList: {
+    // Removed maxHeight to show all calculations
+  },
+  calculationItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 15,
+    marginBottom: 8,
+    backgroundColor: '#f8f8f8',
+    borderRadius: 8,
+  },
+  adjustedItem: {
+    backgroundColor: '#fff8e1',
+    borderWidth: 1,
+    borderColor: '#ffcc02',
+  },
+  calculationInfo: {
+    flex: 1,
+  },
+  calculationName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 2,
+  },
+  calculationRole: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 2,
+  },
+  calculationPercentage: {
+    fontSize: 12,
+    color: '#999',
+  },
+  adjustedText: {
+    color: '#f57c00',
+  },
+  calculationAmount: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#2e7d32',
+  },
+  totalRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 15,
+    marginTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#e0e0e0',
+  },
+  totalLabel: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#333',
+  },
+  totalAmount: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#2e7d32',
+  },
+  saveButton: {
+    backgroundColor: '#4CAF50',
+    paddingVertical: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  saveButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '600',
   },
 });
