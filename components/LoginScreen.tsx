@@ -1,3 +1,4 @@
+import { AppColors } from '@/constants/theme';
 import { useApp } from '@/context/AppContext';
 import React, { useState } from 'react';
 import {
@@ -46,6 +47,7 @@ export default function LoginScreen() {
               value={username}
               onChangeText={setUsername}
               placeholder="Enter your username"
+              placeholderTextColor={AppColors.textMuted}
               autoCapitalize="none"
               autoCorrect={false}
             />
@@ -58,6 +60,7 @@ export default function LoginScreen() {
               value={password}
               onChangeText={setPassword}
               placeholder="Enter your password"
+              placeholderTextColor={AppColors.textMuted}
               secureTextEntry
               autoCapitalize="none"
               autoCorrect={false}
@@ -80,7 +83,7 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: AppColors.background,
   },
   content: {
     flex: 1,
@@ -96,15 +99,15 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   title: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: 'bold',
-    color: '#333',
+    color: AppColors.text,
     textAlign: 'center',
     marginBottom: 10,
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
+    color: AppColors.textSecondary,
     textAlign: 'center',
   },
   formContainer: {
@@ -116,41 +119,46 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: AppColors.text,
     marginBottom: 8,
   },
   input: {
-    backgroundColor: '#fff',
+    backgroundColor: AppColors.card,
     borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
+    borderColor: AppColors.border,
+    borderRadius: 12,
     paddingHorizontal: 15,
     paddingVertical: 12,
     fontSize: 16,
-    color: '#333',
+    color: AppColors.text,
   },
   loginButton: {
-    backgroundColor: '#2196F3',
-    borderRadius: 8,
+    backgroundColor: AppColors.primary,
+    borderRadius: 12,
     paddingVertical: 15,
     alignItems: 'center',
     marginTop: 10,
+    shadowColor: AppColors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
   loginButtonText: {
-    color: '#fff',
+    color: AppColors.background,
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   demoNote: {
     marginTop: 30,
     padding: 15,
-    backgroundColor: '#fff3cd',
-    borderRadius: 8,
+    backgroundColor: AppColors.cardDark,
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#ffeaa7',
+    borderColor: AppColors.border,
   },
   demoText: {
-    color: '#856404',
+    color: AppColors.accent,
     textAlign: 'center',
     fontSize: 14,
     fontStyle: 'italic',

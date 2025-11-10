@@ -3,19 +3,25 @@ import React from 'react';
 
 import { HapticTab } from '@/components/haptic-tab';
 import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { AppColors } from '@/constants/theme';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarActiveTintColor: AppColors.primary,
+        tabBarInactiveTintColor: '#666666',  // Gray color for better visibility
+        tabBarStyle: {
+          backgroundColor: AppColors.cardDark,
+          borderTopWidth: 1,
+          borderTopColor: AppColors.border,
+          height: 65,
+          paddingBottom: 10,
+          paddingTop: 10,
+        },
         headerShown: false,
         tabBarButton: HapticTab,
-        tabBarShowLabel: false, // Hide text labels, show only icons
+        tabBarShowLabel: false,
       }}>
       <Tabs.Screen
         name="staff"
@@ -44,7 +50,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="explore"
         options={{
-          href: null, // Hide this tab
+          href: null,
         }}
       />
     </Tabs>

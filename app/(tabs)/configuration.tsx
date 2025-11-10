@@ -1,3 +1,4 @@
+import { AppColors } from '@/constants/theme';
 import React from 'react';
 import {
     ScrollView,
@@ -38,7 +39,7 @@ export default function ConfigurationScreen() {
       <Switch
         value={settings[key]}
         onValueChange={(value) => updateSetting(key, value)}
-        trackColor={{ false: '#e0e0e0', true: '#2196F3' }}
+        trackColor={{ false: AppColors.border, true: AppColors.primary }}
         thumbColor={settings[key] ? '#fff' : '#f4f3f4'}
       />
     </View>
@@ -136,28 +137,28 @@ export default function ConfigurationScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: AppColors.background,
   },
   header: {
     paddingHorizontal: 20,
     paddingVertical: 15,
-    backgroundColor: '#fff',
+    backgroundColor: AppColors.card,
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderBottomColor: AppColors.border,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
+    color: AppColors.text,
   },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: 100, // Add bottom padding to prevent overlap with tab bar
+    paddingBottom: 100,
   },
   section: {
-    backgroundColor: '#fff',
+    backgroundColor: AppColors.card,
     marginTop: 10,
     paddingHorizontal: 20,
     paddingVertical: 15,
@@ -165,7 +166,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#333',
+    color: AppColors.text,
     marginBottom: 15,
   },
   settingItem: {
@@ -174,7 +175,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: AppColors.border,
   },
   settingInfo: {
     flexDirection: 'row',
@@ -191,12 +192,12 @@ const styles = StyleSheet.create({
   settingTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: AppColors.text,
     marginBottom: 2,
   },
   settingSubtitle: {
     fontSize: 14,
-    color: '#666',
+    color: AppColors.textSecondary,
   },
   infoItem: {
     flexDirection: 'row',
@@ -204,16 +205,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: AppColors.border,
   },
   infoLabel: {
     fontSize: 16,
-    color: '#333',
+    color: AppColors.text,
     fontWeight: '500',
   },
   infoValue: {
     fontSize: 16,
-    color: '#2196F3',
+    color: AppColors.primary,
     fontWeight: '600',
   },
   aboutContainer: {
@@ -223,17 +224,17 @@ const styles = StyleSheet.create({
   appName: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
+    color: AppColors.text,
     marginBottom: 5,
   },
   appVersion: {
     fontSize: 16,
-    color: '#666',
+    color: AppColors.textSecondary,
     marginBottom: 15,
   },
   appDescription: {
     fontSize: 14,
-    color: '#666',
+    color: AppColors.textSecondary,
     textAlign: 'center',
     lineHeight: 20,
     marginBottom: 30,
@@ -245,7 +246,7 @@ const styles = StyleSheet.create({
   },
   linkButtonText: {
     fontSize: 16,
-    color: '#2196F3',
+    color: AppColors.primary,
     fontWeight: '500',
   },
 });

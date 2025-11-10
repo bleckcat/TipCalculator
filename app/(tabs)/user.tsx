@@ -1,3 +1,4 @@
+import { AppColors } from '@/constants/theme';
 import { useApp } from '@/context/AppContext';
 import React from 'react';
 import {
@@ -90,27 +91,27 @@ export default function UserScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: AppColors.background,
   },
   header: {
     paddingHorizontal: 20,
     paddingVertical: 15,
-    backgroundColor: '#fff',
+    backgroundColor: AppColors.card,
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderBottomColor: AppColors.border,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
+    color: AppColors.text,
   },
   content: {
     flex: 1,
     paddingHorizontal: 20,
-    paddingBottom: 100, // Add bottom padding to prevent overlap with tab bar
+    paddingBottom: 100,
   },
   profileSection: {
-    backgroundColor: '#fff',
+    backgroundColor: AppColors.card,
     borderRadius: 12,
     padding: 30,
     alignItems: 'center',
@@ -126,7 +127,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#2196F3',
+    backgroundColor: AppColors.primary,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 15,
@@ -139,15 +140,15 @@ const styles = StyleSheet.create({
   username: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
+    color: AppColors.text,
     marginBottom: 5,
   },
   userRole: {
     fontSize: 16,
-    color: '#666',
+    color: AppColors.textSecondary,
   },
   statsSection: {
-    backgroundColor: '#fff',
+    backgroundColor: AppColors.card,
     borderRadius: 12,
     padding: 20,
     marginBottom: 20,
@@ -165,16 +166,16 @@ const styles = StyleSheet.create({
   statNumber: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#2196F3',
+    color: AppColors.primary,
     marginBottom: 5,
   },
   statLabel: {
     fontSize: 12,
-    color: '#666',
+    color: AppColors.textSecondary,
     textAlign: 'center',
   },
   actionsSection: {
-    backgroundColor: '#fff',
+    backgroundColor: AppColors.card,
     borderRadius: 12,
     padding: 20,
     marginBottom: 20,
@@ -187,20 +188,20 @@ const styles = StyleSheet.create({
   actionItem: {
     paddingVertical: 15,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: AppColors.border,
   },
   actionText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: AppColors.text,
     marginBottom: 5,
   },
   actionSubtext: {
     fontSize: 14,
-    color: '#666',
+    color: AppColors.textSecondary,
   },
   logoutButton: {
-    backgroundColor: '#f44336',
+    backgroundColor: AppColors.error,
     borderRadius: 8,
     paddingVertical: 15,
     alignItems: 'center',
