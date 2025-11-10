@@ -5,7 +5,6 @@ import { calculateTips, formatCurrency, formatPercentage, generateTipCalculation
 import React, { useEffect, useState } from 'react';
 import {
   Alert,
-  FlatList,
   ScrollView,
   StyleSheet,
   Text,
@@ -79,6 +78,7 @@ export default function CalculateTipScreen() {
     
     return (
       <TouchableOpacity
+        key={item.id}
         style={[
           styles.staffItem,
           isSelected && styles.selectedStaffItem,
@@ -102,10 +102,12 @@ export default function CalculateTipScreen() {
   };
 
   const renderCalculationItem = ({ item }: { item: CalculationStaff }) => (
-    <View style={[
-      styles.calculationItem,
-      calculationResult?.adjustedPercentages && styles.adjustedItem,
-    ]}>
+    <View 
+      key={item.staffId}
+      style={[
+        styles.calculationItem,
+        calculationResult?.adjustedPercentages && styles.adjustedItem,
+      ]}>
       <View style={styles.calculationInfo}>
         <Text style={styles.calculationName}>{item.staffName}</Text>
         <Text style={styles.calculationRole}>{item.role.name}</Text>
@@ -155,13 +157,9 @@ export default function CalculateTipScreen() {
               <Text style={styles.emptySubtext}>Go to Staff tab to add team members</Text>
             </View>
           ) : (
-            <FlatList
-              data={state.staff}
-              renderItem={renderStaffItem}
-              keyExtractor={item => item.id}
-              style={styles.staffList}
-              nestedScrollEnabled={true}
-            />
+            <View style={styles.staffList}>
+              {state.staff.map((item) => renderStaffItem({ item }))}
+            </View>
           )}
         </View>
 
@@ -184,13 +182,9 @@ export default function CalculateTipScreen() {
               </View>
             )}
 
-            <FlatList
-              data={calculationResult.calculationStaff}
-              renderItem={renderCalculationItem}
-              keyExtractor={item => item.staffId}
-              style={styles.calculationList}
-              nestedScrollEnabled={true}
-            />
+            <View style={styles.calculationList}>
+              {calculationResult.calculationStaff.map((item) => renderCalculationItem({ item }))}
+            </View>
 
             <View style={styles.totalRow}>
               <Text style={styles.totalLabel}>Total Distributed:</Text>
