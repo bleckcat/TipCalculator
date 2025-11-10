@@ -3,14 +3,14 @@ import { useApp } from '@/context/AppContext';
 import { Staff, StaffRole } from '@/types';
 import React, { useState } from 'react';
 import {
-    Alert,
-    FlatList,
-    Modal,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  FlatList,
+  Modal,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -103,9 +103,6 @@ export default function StaffScreen() {
         <Text style={styles.staffRole}>
           {item.role.name} • {item.customPercentage}% shift
         </Text>
-        <Text style={styles.basePercentage}>
-          Base: {item.role.basePercentage}% tip
-        </Text>
       </View>
       <View style={styles.staffActions}>
         <TouchableOpacity
@@ -135,7 +132,6 @@ export default function StaffScreen() {
     >
       <View style={[styles.roleColor, { backgroundColor: role.color }]} />
       <Text style={styles.roleName}>{role.name}</Text>
-      <Text style={styles.rolePercentage}>{role.basePercentage}%</Text>
     </TouchableOpacity>
   );
 

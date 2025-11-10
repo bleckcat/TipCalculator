@@ -1,7 +1,7 @@
 import { AppColors } from '@/constants/theme';
 import { useApp } from '@/context/AppContext';
 import { CalculationStaff, Staff } from '@/types';
-import { calculateTips, formatCurrency, formatPercentage, generateTipCalculationId } from '@/utils/tipCalculations';
+import { calculateTips, formatCurrency, generateTipCalculationId } from '@/utils/tipCalculations';
 import React, { useEffect, useState } from 'react';
 import {
   Alert,
@@ -22,6 +22,7 @@ export default function CalculateTipScreen() {
     calculationStaff: CalculationStaff[];
     adjustedPercentages: boolean;
     totalPercentage: number;
+    undistributedAmount: number;
   } | null>(null);
 
   useEffect(() => {
@@ -61,6 +62,7 @@ export default function CalculateTipScreen() {
       totalTipAmount: parseFloat(totalAmount),
       staffMembers: calculationResult.calculationStaff,
       adjustedPercentages: calculationResult.adjustedPercentages,
+      undistributedAmount: calculationResult.undistributedAmount,
     };
 
     addTipCalculation(calculation);
@@ -92,9 +94,6 @@ export default function CalculateTipScreen() {
           <Text style={[styles.staffRole, isSelected && styles.selectedText]}>
             {item.role.name} • {item.customPercentage}% shift
           </Text>
-          <Text style={[styles.basePercentage, isSelected && styles.selectedText]}>
-            Base: {item.role.basePercentage}% tip
-          </Text>
         </View>
         <View style={[styles.roleIndicator, { backgroundColor: item.role.color }]} />
       </TouchableOpacity>
@@ -106,23 +105,17 @@ export default function CalculateTipScreen() {
       key={item.staffId}
       style={[
         styles.calculationItem,
-        calculationResult?.adjustedPercentages && styles.adjustedItem,
       ]}>
       <View style={styles.calculationInfo}>
         <Text style={styles.calculationName}>{item.staffName}</Text>
-        <Text style={styles.calculationRole}>{item.role.name}</Text>
-        <Text style={[
-          styles.calculationPercentage,
-          calculationResult?.adjustedPercentages && styles.adjustedText,
-        ]}>
-          {formatPercentage(item.calculatedPercentage)}
-          {calculationResult?.adjustedPercentages && ' (adjusted)'}
+        <Text style={styles.calculationRole}>
+          {item.role.name} • {item.pool === 'pool1' ? '97% Pool' : '3% Pool'}
+        </Text>
+        <Text style={styles.calculationPercentage}>
+          {item.customPercentage}% shift
         </Text>
       </View>
-      <Text style={[
-        styles.calculationAmount,
-        calculationResult?.adjustedPercentages && styles.adjustedText,
-      ]}>
+      <Text style={styles.calculationAmount}>
         {formatCurrency(item.tipAmount)}
       </Text>
     </View>
@@ -167,20 +160,7 @@ export default function CalculateTipScreen() {
           <View style={styles.section}>
             <View style={styles.calculationHeader}>
               <Text style={styles.sectionTitle}>Calculation Results</Text>
-              {calculationResult.adjustedPercentages && (
-                <View style={styles.warningBadge}>
-                  <Text style={styles.warningText}>ADJUSTED</Text>
-                </View>
-              )}
             </View>
-            
-            {calculationResult.adjustedPercentages && (
-              <View style={styles.warningMessage}>
-                <Text style={styles.warningMessageText}>
-                  Total percentages exceeded 100%. Values have been adjusted proportionally.
-                </Text>
-              </View>
-            )}
 
             <View style={styles.calculationList}>
               {calculationResult.calculationStaff.map((item) => renderCalculationItem({ item }))}
@@ -196,6 +176,15 @@ export default function CalculateTipScreen() {
                 )}
               </Text>
             </View>
+
+            {calculationResult.undistributedAmount > 0 && (
+              <View style={styles.undistributedRow}>
+                <Text style={styles.undistributedLabel}>Undistributed (rounded down):</Text>
+                <Text style={styles.undistributedAmount}>
+                  {formatCurrency(calculationResult.undistributedAmount)}
+                </Text>
+              </View>
+            )}
 
             <TouchableOpacity
               style={styles.saveButton}
@@ -416,6 +405,28 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: AppColors.primary,
+  },
+  undistributedRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    marginTop: 8,
+    backgroundColor: AppColors.background,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: AppColors.warning,
+  },
+  undistributedLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: AppColors.textSecondary,
+  },
+  undistributedAmount: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: AppColors.warning,
   },
   saveButton: {
     backgroundColor: AppColors.primary,

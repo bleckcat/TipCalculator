@@ -18,7 +18,8 @@ export interface TipCalculation {
   date: string;
   totalTipAmount: number;
   staffMembers: CalculationStaff[];
-  adjustedPercentages: boolean; // True if percentages were adjusted due to exceeding 100%
+  adjustedPercentages: boolean; // No longer used but kept for compatibility
+  undistributedAmount?: number; // Amount not distributed due to rounding down
 }
 
 export interface CalculationStaff {
@@ -26,33 +27,48 @@ export interface CalculationStaff {
   staffName: string;
   role: StaffRole;
   customPercentage: number;
-  calculatedPercentage: number; // Final percentage after adjustments
+  calculatedPercentage: number; // No longer used but kept for compatibility
   tipAmount: number;
+  pool: 'pool1' | 'pool2'; // Which pool this staff member belongs to
 }
 
+// Pool 1 (97%): Waiter, Gaucho, Bar, Head Floor - shared evenly
+// Pool 2 (3%): Busser, Gourmet Table - shared evenly
 export const DEFAULT_ROLES: StaffRole[] = [
   {
     id: 'waiter',
     name: 'Waiter',
-    basePercentage: 15,
+    basePercentage: 0, // No longer used
     color: '#2196F3'
+  },
+  {
+    id: 'gaucho',
+    name: 'Gaucho',
+    basePercentage: 0, // No longer used
+    color: '#9C27B0'
+  },
+  {
+    id: 'bar',
+    name: 'Bar',
+    basePercentage: 0, // No longer used
+    color: '#E91E63'
+  },
+  {
+    id: 'head-floor',
+    name: 'Head Floor',
+    basePercentage: 0, // No longer used
+    color: '#00BCD4'
   },
   {
     id: 'busser',
     name: 'Busser',
-    basePercentage: 3,
+    basePercentage: 0, // No longer used
     color: '#4CAF50'
   },
   {
     id: 'gourmet-table',
     name: 'Gourmet Table',
-    basePercentage: 3,
+    basePercentage: 0, // No longer used
     color: '#FF9800'
-  },
-  {
-    id: 'gaucho',
-    name: 'Gaucho',
-    basePercentage: 15,
-    color: '#9C27B0'
   }
 ];
