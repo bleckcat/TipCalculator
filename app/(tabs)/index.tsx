@@ -18,7 +18,7 @@ export default function CalculateTipScreen() {
   const { state, addTipCalculation } = useApp();
   const [totalAmount, setTotalAmount] = useState('');
   const [mealPeriod, setMealPeriod] = useState<'lunch' | 'dinner'>('dinner');
-  const [selectedStaff, setSelectedStaff] = useState<Staff[]>([]);
+  const [selectedStaffIds, setSelectedStaffIds] = useState<string[]>([]);
   const [calculationResult, setCalculationResult] = useState<{
     calculationStaff: CalculationStaff[];
     adjustedPercentages: boolean;
@@ -26,6 +26,11 @@ export default function CalculateTipScreen() {
     undistributedAmount: number;
     shiftAdjustments: {staffId: string, oldShift: number, newShift: number}[];
   } | null>(null);
+
+  // Get actual staff objects from context using IDs (always up-to-date)
+  const selectedStaff = selectedStaffIds
+    .map(id => state.staff.find(s => s.id === id))
+    .filter((s): s is Staff => s !== undefined);
 
   useEffect(() => {
     if (totalAmount && selectedStaff.length > 0) {
@@ -42,12 +47,12 @@ export default function CalculateTipScreen() {
   }, [totalAmount, selectedStaff, mealPeriod]);
 
   const toggleStaffSelection = (staff: Staff) => {
-    setSelectedStaff(prev => {
-      const isSelected = prev.find(s => s.id === staff.id);
+    setSelectedStaffIds(prev => {
+      const isSelected = prev.includes(staff.id);
       if (isSelected) {
-        return prev.filter(s => s.id !== staff.id);
+        return prev.filter(id => id !== staff.id);
       } else {
-        return [...prev, staff];
+        return [...prev, staff.id];
       }
     });
   };
@@ -72,14 +77,14 @@ export default function CalculateTipScreen() {
     
     // Reset form
     setTotalAmount('');
-    setSelectedStaff([]);
+    setSelectedStaffIds([]);
     setCalculationResult(null);
     
     Alert.alert('Success', 'Tip calculation saved successfully!');
   };
 
   const renderStaffItem = ({ item }: { item: Staff }) => {
-    const isSelected = selectedStaff.find(s => s.id === item.id);
+    const isSelected = selectedStaffIds.includes(item.id);
     const currentShift = mealPeriod === 'lunch' ? item.lunchShift : item.dinnerShift;
     
     return (
