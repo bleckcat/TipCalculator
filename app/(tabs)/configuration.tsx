@@ -1,62 +1,15 @@
 import { AppColors } from '@/constants/theme';
 import React from 'react';
 import {
-    ScrollView,
-    StyleSheet,
-    Switch,
-    Text,
-    TouchableOpacity,
-    View,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function ConfigurationScreen() {
-  const [settings, setSettings] = React.useState({
-    autoSave: true,
-    showAdjustmentWarnings: true,
-    enableHapticFeedback: true,
-    darkMode: false,
-  });
-
-  const updateSetting = (key: keyof typeof settings, value: boolean) => {
-    setSettings(prev => ({ ...prev, [key]: value }));
-  };
-
-  const renderSettingItem = (
-    title: string,
-    subtitle: string,
-    key: keyof typeof settings,
-    icon: string
-  ) => (
-    <View style={styles.settingItem}>
-      <View style={styles.settingInfo}>
-        <Text style={styles.settingIcon}>{icon}</Text>
-        <View style={styles.settingTextContainer}>
-          <Text style={styles.settingTitle}>{title}</Text>
-          <Text style={styles.settingSubtitle}>{subtitle}</Text>
-        </View>
-      </View>
-      <Switch
-        value={settings[key]}
-        onValueChange={(value) => updateSetting(key, value)}
-        trackColor={{ false: AppColors.border, true: AppColors.primary }}
-        thumbColor={settings[key] ? '#fff' : '#f4f3f4'}
-      />
-    </View>
-  );
-
-  const renderInfoSection = (title: string, items: { label: string; value: string }[]) => (
-    <View style={styles.section}>
-      <Text style={styles.sectionTitle}>{title}</Text>
-      {items.map((item, index) => (
-        <View key={index} style={styles.infoItem}>
-          <Text style={styles.infoLabel}>{item.label}</Text>
-          <Text style={styles.infoValue}>{item.value}</Text>
-        </View>
-      ))}
-    </View>
-  );
-
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -64,48 +17,6 @@ export default function ConfigurationScreen() {
       </View>
 
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>App Settings</Text>
-          {renderSettingItem(
-            'Auto Save Calculations',
-            'Automatically save completed calculations',
-            'autoSave',
-            '💾'
-          )}
-          {renderSettingItem(
-            'Adjustment Warnings',
-            'Show warnings when percentages exceed 100%',
-            'showAdjustmentWarnings',
-            '⚠️'
-          )}
-          {renderSettingItem(
-            'Haptic Feedback',
-            'Enable vibration feedback for interactions',
-            'enableHapticFeedback',
-            '📳'
-          )}
-          {renderSettingItem(
-            'Dark Mode',
-            'Use dark theme throughout the app',
-            'darkMode',
-            '🌙'
-          )}
-        </View>
-
-        {renderInfoSection('Default Tip Percentages', [
-          { label: 'Waiter', value: '15%' },
-          { label: 'Busser', value: '3%' },
-          { label: 'Gourmet Table', value: '3%' },
-          { label: 'Gaucho', value: '15%' },
-        ])}
-
-        {renderInfoSection('Calculation Rules', [
-          { label: 'Full Shift', value: '100%' },
-          { label: 'Half Shift', value: '50%' },
-          { label: 'Overtime Shift', value: '150%' },
-          { label: 'Max Total Percentage', value: '100%' },
-        ])}
-
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>About</Text>
           <View style={styles.aboutContainer}>
@@ -168,54 +79,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: AppColors.text,
     marginBottom: 15,
-  },
-  settingItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: AppColors.border,
-  },
-  settingInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  settingIcon: {
-    fontSize: 24,
-    marginRight: 15,
-  },
-  settingTextContainer: {
-    flex: 1,
-  },
-  settingTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: AppColors.text,
-    marginBottom: 2,
-  },
-  settingSubtitle: {
-    fontSize: 14,
-    color: AppColors.textSecondary,
-  },
-  infoItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: AppColors.border,
-  },
-  infoLabel: {
-    fontSize: 16,
-    color: AppColors.text,
-    fontWeight: '500',
-  },
-  infoValue: {
-    fontSize: 16,
-    color: AppColors.primary,
-    fontWeight: '600',
   },
   aboutContainer: {
     alignItems: 'center',

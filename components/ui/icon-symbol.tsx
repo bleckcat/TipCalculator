@@ -22,6 +22,7 @@ const MAPPING = {
   'dollarsign.circle.fill': 'attach-money',
   'person.circle.fill': 'account-circle',
   'gearshape.fill': 'settings',
+  'clock.fill': 'history',
 } as IconMapping;
 
 /**

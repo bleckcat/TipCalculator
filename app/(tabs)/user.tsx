@@ -2,11 +2,11 @@ import { AppColors } from '@/constants/theme';
 import { useApp } from '@/context/AppContext';
 import React from 'react';
 import {
-    Alert,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Alert,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -60,12 +60,7 @@ export default function UserScreen() {
 
         <View style={styles.actionsSection}>
           <TouchableOpacity style={styles.actionItem}>
-            <Text style={styles.actionText}>📊 View Reports</Text>
-            <Text style={styles.actionSubtext}>Detailed tip distribution reports</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.actionItem}>
-            <Text style={styles.actionText}>📱 Export Data</Text>
+            <Text style={styles.actionText}> Export Data</Text>
             <Text style={styles.actionSubtext}>Export calculations to CSV</Text>
           </TouchableOpacity>
 
