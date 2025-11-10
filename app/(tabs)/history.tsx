@@ -2,6 +2,7 @@ import { AppColors } from "@/constants/theme";
 import { useApp } from "@/context/AppContext";
 import { TipCalculation } from "@/types";
 import { generateTipsPDF } from "@/utils/pdfGenerator";
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import React, { useEffect, useState } from "react";
 import {
   Alert,
@@ -127,7 +128,7 @@ export default function HistoryScreen() {
                         handleExportPDF(calculation);
                       }}
                     >
-                      <Text style={styles.exportIcon}>📄</Text>
+                      <MaterialIcons name="picture-as-pdf" size={20} color={AppColors.primary} />
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -242,11 +243,12 @@ export default function HistoryScreen() {
                 ))}
               </View>
 
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.deleteButton}
                 onPress={handleDelete}
               >
-                <Text style={styles.deleteButtonText}>🗑️ Delete Calculation</Text>
+                <MaterialIcons name="delete" size={18} color="#fff" style={{ marginRight: 6 }} />
+                <Text style={styles.deleteButtonText}>Delete Calculation</Text>
               </TouchableOpacity>
             </ScrollView>
           </View>
@@ -521,11 +523,9 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: AppColors.primaryLight,
+    borderWidth: 1.5,
+    borderColor: AppColors.primary,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  exportIcon: {
-    fontSize: 18,
   },
 });
