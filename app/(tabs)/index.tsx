@@ -4,16 +4,15 @@ import { CalculationStaff, Staff } from '@/types';
 import { calculateTips, formatCurrency, generateTipCalculationId } from '@/utils/tipCalculations';
 import React, { useEffect, useState } from 'react';
 import {
-    Alert,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
 export default function CalculateTipScreen() {
   const { state, addTipCalculation } = useApp();
   const [totalAmount, setTotalAmount] = useState('');
@@ -636,12 +635,42 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: AppColors.warning,
   },
+  actionButtonsContainer: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 20,
+  },
+  exportButton: {
+    flex: 1,
+    backgroundColor: AppColors.secondary || '#6C757D',
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  exportButtonDisabled: {
+    backgroundColor: AppColors.border,
+    shadowOpacity: 0,
+    elevation: 0,
+  },
+  exportButtonText: {
+    color: AppColors.background,
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  exportButtonTextDisabled: {
+    color: AppColors.textMuted,
+  },
   saveButton: {
+    flex: 1,
     backgroundColor: AppColors.primary,
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
-    marginTop: 20,
     shadowColor: AppColors.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.4,

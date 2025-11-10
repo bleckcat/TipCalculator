@@ -1,6 +1,7 @@
 import { AppColors } from "@/constants/theme";
 import { useApp } from "@/context/AppContext";
 import { TipCalculation } from "@/types";
+import { generateTipsPDF } from "@/utils/pdfGenerator";
 import React, { useEffect, useState } from "react";
 import {
   Alert,
@@ -47,6 +48,20 @@ export default function HistoryScreen() {
           },
         ]
       );
+    }
+  };
+
+  const handleExportPDF = async (calculation: TipCalculation) => {
+    try {
+      await generateTipsPDF(
+        calculation.staffMembers,
+        calculation.totalTipAmount,
+        calculation.mealPeriod,
+        calculation.date
+      );
+    } catch (error) {
+      Alert.alert('Error', 'Failed to generate PDF. Please try again.');
+      console.error('PDF generation error:', error);
     }
   };
 
@@ -101,9 +116,20 @@ export default function HistoryScreen() {
                         : "🌙 Dinner"}
                     </Text>
                   </View>
-                  <Text style={styles.totalAmount}>
-                    ${calculation.totalTipAmount.toFixed(2)}
-                  </Text>
+                  <View style={styles.headerRight}>
+                    <Text style={styles.totalAmount}>
+                      ${calculation.totalTipAmount.toFixed(2)}
+                    </Text>
+                    <TouchableOpacity
+                      style={styles.exportButton}
+                      onPress={(e) => {
+                        e.stopPropagation();
+                        handleExportPDF(calculation);
+                      }}
+                    >
+                      <Text style={styles.exportIcon}>📄</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
 
                 <View style={styles.poolsContainer}>
@@ -485,5 +511,21 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 14,
     fontWeight: '600',
+  },
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  exportButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: AppColors.primaryLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  exportIcon: {
+    fontSize: 18,
   },
 });
