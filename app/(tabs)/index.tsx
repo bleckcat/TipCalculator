@@ -31,20 +31,28 @@ export default function CalculateTipScreen() {
   } | null>(null);
 
   const handleAmountChange = (text: string) => {
-    // Remove any non-numeric characters except decimal point
-    const cleaned = text.replace(/[^0-9.]/g, '');
+    // Remove any non-numeric characters
+    const cleaned = text.replace(/[^0-9]/g, "");
     
-    // Ensure only one decimal point
-    const parts = cleaned.split('.');
-    const formatted = parts.length > 2 ? parts[0] + '.' + parts.slice(1).join('') : cleaned;
+    if (cleaned === "") {
+      setTotalAmount("");
+      setAmountError("");
+      return;
+    }
+
+    // Convert to cents (integer)
+    const cents = parseInt(cleaned, 10);
     
-    setTotalAmount(formatted);
+    // Convert to dollars with 2 decimal places
+    const dollars = (cents / 100).toFixed(2);
     
+    setTotalAmount(dollars);
+
     // Validate
-    if (formatted && (isNaN(parseFloat(formatted)) || parseFloat(formatted) <= 0)) {
-      setAmountError('Please enter a valid amount');
+    if (parseFloat(dollars) <= 0) {
+      setAmountError("Please enter a valid amount");
     } else {
-      setAmountError('');
+      setAmountError("");
     }
   };
 
@@ -197,7 +205,7 @@ export default function CalculateTipScreen() {
               onChangeText={handleAmountChange}
               placeholder="0.00"
               placeholderTextColor="#666666"
-              keyboardType="decimal-pad"
+              keyboardType="number-pad"
             />
           </View>
           {amountError ? (
