@@ -3,15 +3,15 @@ import { useApp } from '@/context/AppContext';
 import { Staff, StaffRole } from '@/types';
 import React, { useState } from 'react';
 import {
-  Alert,
-  FlatList,
-  Modal,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    Alert,
+    FlatList,
+    Modal,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -25,8 +25,35 @@ export default function StaffScreen() {
     lunchShift: '100',
     dinnerShift: '100',
   });
+  const [errors, setErrors] = useState({
+    name: '',
+    lunchShift: '',
+    dinnerShift: '',
+  });
 
   const roles = getRoles();
+
+  const validateName = (name: string): string => {
+    if (!name.trim()) {
+      return 'Name is required';
+    }
+    if (/\d/.test(name)) {
+      return 'Name cannot contain numbers';
+    }
+    // Check for duplicate names (excluding current staff if editing)
+    const isDuplicate = state.staff.some(
+      s => s.name.toLowerCase() === name.trim().toLowerCase() && s.id !== editingStaff?.id
+    );
+    if (isDuplicate) {
+      return 'A staff member with this name already exists';
+    }
+    return '';
+  };
+
+  const handleNameChange = (name: string) => {
+    setFormData({ ...formData, name });
+    setErrors({ ...errors, name: validateName(name) });
+  };
 
   const openModal = (staff?: Staff) => {
     if (staff) {
@@ -46,6 +73,7 @@ export default function StaffScreen() {
         dinnerShift: '100',
       });
     }
+    setErrors({ name: '', lunchShift: '', dinnerShift: '' });
     setModalVisible(true);
   };
 
@@ -55,6 +83,12 @@ export default function StaffScreen() {
   };
 
   const handleSave = () => {
+    const nameError = validateName(formData.name);
+    if (nameError) {
+      setErrors({ ...errors, name: nameError });
+      return;
+    }
+
     if (!formData.name.trim()) {
       Alert.alert('Error', 'Please enter a name');
       return;
@@ -195,12 +229,17 @@ export default function StaffScreen() {
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Name</Text>
               <TextInput
-                style={styles.textInput}
+                style={[styles.textInput, errors.name && styles.inputError]}
                 value={formData.name}
-                onChangeText={name => setFormData({ ...formData, name })}
+                onChangeText={handleNameChange}
                 placeholder="Enter staff member name"
                 placeholderTextColor="#666666"
               />
+              {errors.name ? (
+                <Text style={styles.errorText}>{errors.name}</Text>
+              ) : (
+                <Text style={styles.helperText}>Name cannot contain numbers</Text>
+              )}
             </View>
 
             <View style={styles.inputGroup}>
@@ -415,10 +454,14 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: AppColors.border,
     borderRadius: 12,
-    paddingHorizontal: 18,
-    paddingVertical: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     fontSize: 16,
     color: AppColors.text,
+  },
+  inputError: {
+    borderColor: AppColors.error,
+    borderWidth: 2,
   },
   shiftInputRow: {
     flexDirection: 'row',

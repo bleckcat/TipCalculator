@@ -16,6 +16,7 @@ interface AppContextType {
   updateStaff: (staff: Staff) => void;
   removeStaff: (staffId: string) => void;
   addTipCalculation: (calculation: TipCalculation) => void;
+  removeTipCalculation: (calculationId: string) => void;
   getRoles: () => StaffRole[];
 }
 
@@ -25,7 +26,8 @@ type AppAction =
   | { type: 'ADD_STAFF'; payload: Staff }
   | { type: 'UPDATE_STAFF'; payload: Staff }
   | { type: 'REMOVE_STAFF'; payload: string }
-  | { type: 'ADD_TIP_CALCULATION'; payload: TipCalculation };
+  | { type: 'ADD_TIP_CALCULATION'; payload: TipCalculation }
+  | { type: 'REMOVE_TIP_CALCULATION'; payload: string };
 
 const initialState: AppState = {
   isLoggedIn: false,
@@ -70,6 +72,16 @@ function appReducer(state: AppState, action: AppAction): AppState {
         ...state,
         tipCalculations: [...state.tipCalculations, action.payload],
       };
+    case 'REMOVE_TIP_CALCULATION':
+      console.log('REDUCER: Removing calculation');
+      console.log('REDUCER: Payload ID:', action.payload);
+      console.log('REDUCER: Current calculations:', state.tipCalculations.map(c => ({ id: c.id, date: c.date })));
+      const filtered = state.tipCalculations.filter(c => c.id !== action.payload);
+      console.log('REDUCER: After filter:', filtered.map(c => ({ id: c.id, date: c.date })));
+      return {
+        ...state,
+        tipCalculations: filtered,
+      };
     default:
       return state;
   }
@@ -105,6 +117,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: 'ADD_TIP_CALCULATION', payload: calculation });
   };
 
+  const removeTipCalculation = (calculationId: string) => {
+    console.log('Removing calculation with ID:', calculationId);
+    console.log('Current calculations:', state.tipCalculations.map(c => c.id));
+    dispatch({ type: 'REMOVE_TIP_CALCULATION', payload: calculationId });
+  };
+
   const getRoles = () => DEFAULT_ROLES;
 
   return (
@@ -116,6 +134,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       updateStaff,
       removeStaff,
       addTipCalculation,
+      removeTipCalculation,
       getRoles,
     }}>
       {children}

@@ -4,19 +4,20 @@ import { CalculationStaff, Staff } from '@/types';
 import { calculateTips, formatCurrency, generateTipCalculationId } from '@/utils/tipCalculations';
 import React, { useEffect, useState } from 'react';
 import {
-  Alert,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    Alert,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function CalculateTipScreen() {
   const { state, addTipCalculation } = useApp();
   const [totalAmount, setTotalAmount] = useState('');
+  const [amountError, setAmountError] = useState('');
   const [mealPeriod, setMealPeriod] = useState<'lunch' | 'dinner'>('dinner');
   const [selectedStaffIds, setSelectedStaffIds] = useState<string[]>([]);
   const [calculationResult, setCalculationResult] = useState<{
@@ -29,24 +30,40 @@ export default function CalculateTipScreen() {
     pool2ExtraAmount: number;
   } | null>(null);
 
+  const handleAmountChange = (text: string) => {
+    // Remove any non-numeric characters except decimal point
+    const cleaned = text.replace(/[^0-9.]/g, '');
+    
+    // Ensure only one decimal point
+    const parts = cleaned.split('.');
+    const formatted = parts.length > 2 ? parts[0] + '.' + parts.slice(1).join('') : cleaned;
+    
+    setTotalAmount(formatted);
+    
+    // Validate
+    if (formatted && (isNaN(parseFloat(formatted)) || parseFloat(formatted) <= 0)) {
+      setAmountError('Please enter a valid amount');
+    } else {
+      setAmountError('');
+    }
+  };
+
+  const isAmountValid = totalAmount !== '' && !amountError && !isNaN(parseFloat(totalAmount)) && parseFloat(totalAmount) > 0;
+
   // Get actual staff objects from context using IDs (always up-to-date)
   const selectedStaff = selectedStaffIds
     .map(id => state.staff.find(s => s.id === id))
     .filter((s): s is Staff => s !== undefined);
 
   useEffect(() => {
-    if (totalAmount && selectedStaff.length > 0) {
+    if (isAmountValid && selectedStaff.length > 0) {
       const amount = parseFloat(totalAmount);
-      if (!isNaN(amount) && amount > 0) {
-        const result = calculateTips(amount, selectedStaff, mealPeriod);
-        setCalculationResult(result);
-      } else {
-        setCalculationResult(null);
-      }
+      const result = calculateTips(amount, selectedStaff, mealPeriod);
+      setCalculationResult(result);
     } else {
       setCalculationResult(null);
     }
-  }, [totalAmount, selectedStaff, mealPeriod]);
+  }, [totalAmount, selectedStaff, mealPeriod, isAmountValid]);
 
   const toggleStaffSelection = (staff: Staff) => {
     setSelectedStaffIds(prev => {
@@ -172,14 +189,22 @@ export default function CalculateTipScreen() {
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Total Tip Amount</Text>
-          <TextInput
-            style={styles.amountInput}
-            value={totalAmount}
-            onChangeText={setTotalAmount}
-            placeholder="Enter total cash tips"
-            placeholderTextColor="#666666"
-            keyboardType="numeric"
-          />
+          <View style={styles.amountInputContainer}>
+            <Text style={styles.dollarSign}>$</Text>
+            <TextInput
+              style={[styles.amountInput, amountError && styles.inputError]}
+              value={totalAmount}
+              onChangeText={handleAmountChange}
+              placeholder="0.00"
+              placeholderTextColor="#666666"
+              keyboardType="decimal-pad"
+            />
+          </View>
+          {amountError ? (
+            <Text style={styles.errorText}>{amountError}</Text>
+          ) : (
+            <Text style={styles.helperText}>Enter the total cash tips to distribute</Text>
+          )}
         </View>
 
         <View style={styles.section}>
@@ -267,10 +292,17 @@ export default function CalculateTipScreen() {
             )}
 
             <TouchableOpacity
-              style={styles.saveButton}
+              style={[
+                styles.saveButton,
+                (!isAmountValid || !calculationResult) && styles.saveButtonDisabled
+              ]}
               onPress={handleSaveCalculation}
+              disabled={!isAmountValid || !calculationResult}
             >
-              <Text style={styles.saveButtonText}>Save Calculation</Text>
+              <Text style={[
+                styles.saveButtonText,
+                (!isAmountValid || !calculationResult) && styles.saveButtonTextDisabled
+              ]}>Save Calculation</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -378,16 +410,42 @@ const styles = StyleSheet.create({
     color: AppColors.primary,
     fontWeight: '600',
   },
-  amountInput: {
+  amountInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: AppColors.background,
     borderWidth: 2,
     borderColor: AppColors.border,
     borderRadius: 12,
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
+  },
+  dollarSign: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: AppColors.textSecondary,
+    marginRight: 4,
+  },
+  amountInput: {
+    flex: 1,
     paddingVertical: 16,
     fontSize: 24,
     fontWeight: '700',
     color: AppColors.primary,
+  },
+  inputError: {
+    borderColor: AppColors.error,
+    borderWidth: 2,
+  },
+  errorText: {
+    fontSize: 12,
+    color: AppColors.error,
+    marginTop: 6,
+    fontWeight: '600',
+  },
+  helperText: {
+    fontSize: 12,
+    color: AppColors.textMuted,
+    marginTop: 6,
   },
   staffList: {
     // Show all staff members
@@ -582,9 +640,17 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 4,
   },
+  saveButtonDisabled: {
+    backgroundColor: AppColors.border,
+    shadowOpacity: 0,
+    elevation: 0,
+  },
   saveButtonText: {
     color: AppColors.background,
     fontSize: 18,
     fontWeight: '700',
+  },
+  saveButtonTextDisabled: {
+    color: AppColors.textMuted,
   },
 });
