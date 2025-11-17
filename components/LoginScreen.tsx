@@ -2,14 +2,15 @@ import { AppColors } from '@/constants/theme';
 import { useApp } from '@/context/AppContext';
 import React, { useState } from 'react';
 import {
-    Alert,
-    KeyboardAvoidingView,
-    Platform,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 export default function LoginScreen() {
@@ -34,8 +35,12 @@ export default function LoginScreen() {
     >
       <View style={styles.content}>
         <View style={styles.logoContainer}>
-          <Text style={styles.logoText}>💰</Text>
-          <Text style={styles.title}>Tip Calculator</Text>
+          <Image 
+            source={require('@/assets/images/logo.png')} 
+            style={styles.logo}
+            resizeMode="contain"
+          />
+          <Text style={styles.title}>Adega Cash Tip</Text>
           <Text style={styles.subtitle}>Restaurant Staff Tip Management</Text>
         </View>
 
@@ -93,6 +98,11 @@ const styles = StyleSheet.create({
   logoContainer: {
     alignItems: 'center',
     marginBottom: 50,
+  },
+  logo: {
+    width: 120,
+    height: 120,
+    marginBottom: 20,
   },
   logoText: {
     fontSize: 80,
