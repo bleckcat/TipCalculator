@@ -3,8 +3,7 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 
-import LoginScreen from '@/components/LoginScreen';
-import { AppProvider, useApp } from '@/context/AppContext';
+import { AppProvider } from '@/context/AppContext';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
 export const unstable_settings = {
@@ -13,11 +12,12 @@ export const unstable_settings = {
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
-  const { state } = useApp();
+  // const { state } = useApp();
 
-  if (!state.isLoggedIn) {
-    return <LoginScreen />;
-  }
+  // Commented out login requirement
+  // if (!state.isLoggedIn) {
+  //   return <LoginScreen />;
+  // }
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>

@@ -1,5 +1,6 @@
 import { DEFAULT_ROLES, Staff, StaffRole, TipCalculation } from '@/types';
-import React, { createContext, useContext, useReducer } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { createContext, useContext, useEffect, useReducer } from 'react';
 
 interface AppState {
   isLoggedIn: boolean;
@@ -27,7 +28,8 @@ type AppAction =
   | { type: 'UPDATE_STAFF'; payload: Staff }
   | { type: 'REMOVE_STAFF'; payload: string }
   | { type: 'ADD_TIP_CALCULATION'; payload: TipCalculation }
-  | { type: 'REMOVE_TIP_CALCULATION'; payload: string };
+  | { type: 'REMOVE_TIP_CALCULATION'; payload: string }
+  | { type: 'LOAD_STATE'; payload: Partial<AppState> };
 
 const initialState: AppState = {
   isLoggedIn: false,
@@ -73,14 +75,14 @@ function appReducer(state: AppState, action: AppAction): AppState {
         tipCalculations: [...state.tipCalculations, action.payload],
       };
     case 'REMOVE_TIP_CALCULATION':
-      console.log('REDUCER: Removing calculation');
-      console.log('REDUCER: Payload ID:', action.payload);
-      console.log('REDUCER: Current calculations:', state.tipCalculations.map(c => ({ id: c.id, date: c.date })));
-      const filtered = state.tipCalculations.filter(c => c.id !== action.payload);
-      console.log('REDUCER: After filter:', filtered.map(c => ({ id: c.id, date: c.date })));
       return {
         ...state,
-        tipCalculations: filtered,
+        tipCalculations: state.tipCalculations.filter(c => c.id !== action.payload),
+      };
+    case 'LOAD_STATE':
+      return {
+        ...state,
+        ...action.payload,
       };
     default:
       return state;
@@ -89,8 +91,42 @@ function appReducer(state: AppState, action: AppAction): AppState {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
+const STORAGE_KEY = '@adega_cash_tip_data';
+
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(appReducer, initialState);
+
+  // Load data from AsyncStorage on mount
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const savedData = await AsyncStorage.getItem(STORAGE_KEY);
+        if (savedData) {
+          const parsedData = JSON.parse(savedData);
+          dispatch({ type: 'LOAD_STATE', payload: parsedData });
+        }
+      } catch (error) {
+        console.error('Error loading data:', error);
+      }
+    };
+    loadData();
+  }, []);
+
+  // Save data to AsyncStorage whenever state changes
+  useEffect(() => {
+    const saveData = async () => {
+      try {
+        const dataToSave = {
+          staff: state.staff,
+          tipCalculations: state.tipCalculations,
+        };
+        await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
+      } catch (error) {
+        console.error('Error saving data:', error);
+      }
+    };
+    saveData();
+  }, [state.staff, state.tipCalculations]);
 
   const login = (username: string, password: string) => {
     // For demo purposes, accept any credentials
