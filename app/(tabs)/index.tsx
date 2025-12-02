@@ -161,7 +161,7 @@ export default function CalculateTipScreen() {
             {item.name}
           </Text>
           <Text style={[styles.staffRole, isSelected && styles.selectedText]}>
-            {item.role.name} • {currentShift}% {mealPeriod}
+            {item.role.name} • {currentShift}h {mealPeriod}
           </Text>
         </View>
         <View style={[styles.roleIndicator, { backgroundColor: item.role.color }]} />

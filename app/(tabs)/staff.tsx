@@ -24,8 +24,8 @@ export default function StaffScreen() {
   const [formData, setFormData] = useState({
     name: '',
     roleId: '',
-    lunchShift: '100',
-    dinnerShift: '100',
+    lunchShift: '6',
+    dinnerShift: '6',
   });
   const [errors, setErrors] = useState({
     name: '',
@@ -78,8 +78,8 @@ export default function StaffScreen() {
       setFormData({
         name: '',
         roleId: roles[0]?.id || '',
-        lunchShift: '100',
-        dinnerShift: '100',
+        lunchShift: '6',
+        dinnerShift: '6',
       });
     }
     setErrors({ name: '', lunchShift: '', dinnerShift: '' });
@@ -112,13 +112,13 @@ export default function StaffScreen() {
     const lunchShift = parseFloat(formData.lunchShift);
     const dinnerShift = parseFloat(formData.dinnerShift);
     
-    if (isNaN(lunchShift) || lunchShift < 0 || lunchShift > 100) {
-      Alert.alert('Error', 'Lunch shift must be between 0% and 100%');
+    if (isNaN(lunchShift) || lunchShift < 0 || lunchShift > 6) {
+      Alert.alert('Error', 'Lunch shift must be between 0 and 6 hours');
       return;
     }
     
-    if (isNaN(dinnerShift) || dinnerShift < 0 || dinnerShift > 100) {
-      Alert.alert('Error', 'Dinner shift must be between 0% and 100%');
+    if (isNaN(dinnerShift) || dinnerShift < 0 || dinnerShift > 6) {
+      Alert.alert('Error', 'Dinner shift must be between 0 and 6 hours');
       return;
     }
 
@@ -159,7 +159,7 @@ export default function StaffScreen() {
           {item.role.name}
         </Text>
         <Text style={styles.staffRole}>
-          Lunch: {item.lunchShift}% • Dinner: {item.dinnerShift}%
+          Lunch: {item.lunchShift}h • Dinner: {item.dinnerShift}h
         </Text>
       </View>
       <View style={styles.staffActions}>
@@ -316,19 +316,19 @@ export default function StaffScreen() {
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Shift Percentages</Text>
+              <Text style={styles.label}>Shift Hours</Text>
               <View style={styles.shiftInputRow}>
                 <View style={styles.shiftInputContainer}>
                   <Text style={styles.shiftInputLabel}>Lunch</Text>
                   <TextInput
                     style={[
                       styles.shiftInput,
-                      parseFloat(formData.lunchShift) > 100 && styles.shiftInputError,
+                      parseFloat(formData.lunchShift) > 6 && styles.shiftInputError,
                     ]}
                     value={formData.lunchShift}
                     onChangeText={lunchShift => setFormData({ ...formData, lunchShift })}
-                    placeholder="100"
-                    keyboardType="numeric"
+                    placeholder="6"
+                    keyboardType="decimal-pad"
                     placeholderTextColor="#666666"
                   />
                 </View>
@@ -337,23 +337,23 @@ export default function StaffScreen() {
                   <TextInput
                     style={[
                       styles.shiftInput,
-                      parseFloat(formData.dinnerShift) > 100 && styles.shiftInputError,
+                      parseFloat(formData.dinnerShift) > 6 && styles.shiftInputError,
                     ]}
                     value={formData.dinnerShift}
                     onChangeText={dinnerShift => setFormData({ ...formData, dinnerShift })}
-                    placeholder="100"
-                    keyboardType="numeric"
+                    placeholder="6"
+                    keyboardType="decimal-pad"
                     placeholderTextColor="#666666"
                   />
                 </View>
               </View>
-              {(parseFloat(formData.lunchShift) > 100 || parseFloat(formData.dinnerShift) > 100) && (
+              {(parseFloat(formData.lunchShift) > 6 || parseFloat(formData.dinnerShift) > 6) && (
                 <Text style={styles.errorText}>
-                  Shift percentage cannot exceed 100%
+                  Shift hours cannot exceed 6 hours
                 </Text>
               )}
               <Text style={styles.helperText}>
-                100% = full shift, 50% = half shift
+                Max 6 hours per shift. Tips: &lt;2hrs = 0%, 2hrs = 50%, 3+hrs = 100%
               </Text>
             </View>
           </ScrollView>

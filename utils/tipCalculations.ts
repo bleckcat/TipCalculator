@@ -1,5 +1,21 @@
 import { CalculationStaff, Staff } from '@/types';
 
+/**
+ * Convert hours worked to tip percentage based on business rules:
+ * - Less than 2 hours: 0% (no tip)
+ * - 2 hours to less than 3 hours: 50% tip
+ * - 3 hours or more: 100% tip
+ */
+function hoursToTipPercentage(hours: number): number {
+  if (hours < 2) {
+    return 0;
+  } else if (hours < 3) {
+    return 50;
+  } else {
+    return 100;
+  }
+}
+
 // Pool 1 roles (97% of total): Waiter, Gaucho, Bar, Head Floor
 const POOL1_ROLES = ['waiter', 'gaucho', 'bar', 'head-floor'];
 // Pool 2 roles (3% of total): Busser, Gourmet Table
@@ -100,9 +116,10 @@ export function calculateTips(
     };
   }
 
-  // Get shift percentages based on meal period (capped at 100% in UI)
+  // Get shift hours and convert to tip percentages based on meal period
   const staffWithShifts = selectedStaff.map(staff => {
-    const shiftPercent = mealPeriod === 'lunch' ? staff.lunchShift : staff.dinnerShift;
+    const shiftHours = mealPeriod === 'lunch' ? staff.lunchShift : staff.dinnerShift;
+    const shiftPercent = hoursToTipPercentage(shiftHours);
     return { staff, shiftPercent };
   });
 

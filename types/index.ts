@@ -2,8 +2,8 @@ export interface Staff {
   id: string;
   name: string;
   role: StaffRole;
-  lunchShift: number; // Lunch shift percentage (default 100 = full shift)
-  dinnerShift: number; // Dinner shift percentage (default 100 = full shift)
+  lunchShift: number; // Lunch shift hours (0-6, default 6 = full shift)
+  dinnerShift: number; // Dinner shift hours (0-6, default 6 = full shift)
   isActive: boolean;
 }
 

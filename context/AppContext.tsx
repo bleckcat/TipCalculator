@@ -103,6 +103,30 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         const savedData = await AsyncStorage.getItem(STORAGE_KEY);
         if (savedData) {
           const parsedData = JSON.parse(savedData);
+          
+          // Migrate old percentage values (0-100) to hours (0-6)
+          // If values are > 6, they're likely percentages that need conversion
+          if (parsedData.staff) {
+            parsedData.staff = parsedData.staff.map((staff: Staff) => {
+              let lunchShift = staff.lunchShift;
+              let dinnerShift = staff.dinnerShift;
+              
+              // Convert percentages to hours: 100% = 6 hours
+              if (lunchShift > 6) {
+                lunchShift = Math.round((lunchShift / 100) * 6 * 10) / 10; // Round to 1 decimal
+              }
+              if (dinnerShift > 6) {
+                dinnerShift = Math.round((dinnerShift / 100) * 6 * 10) / 10;
+              }
+              
+              return {
+                ...staff,
+                lunchShift,
+                dinnerShift,
+              };
+            });
+          }
+          
           dispatch({ type: 'LOAD_STATE', payload: parsedData });
         }
       } catch (error) {
