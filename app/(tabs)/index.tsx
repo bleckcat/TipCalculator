@@ -75,6 +75,19 @@ export default function CalculateTipScreen() {
     return matchesSearch && matchesRole;
   });
 
+  // Check if lunch is available (Friday, Saturday, Sunday only)
+  const isLunchAvailable = () => {
+    const dayOfWeek = selectedDate.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+    return dayOfWeek === 0 || dayOfWeek === 5 || dayOfWeek === 6; // Sunday, Friday, Saturday
+  };
+
+  // If lunch is not available and lunch is selected, switch to dinner
+  useEffect(() => {
+    if (mealPeriod === 'lunch' && !isLunchAvailable()) {
+      setMealPeriod('dinner');
+    }
+  }, [selectedDate]);
+
   useEffect(() => {
     if (isAmountValid && selectedStaff.length > 0) {
       const amount = parseFloat(totalAmount);
@@ -214,12 +227,15 @@ export default function CalculateTipScreen() {
               style={[
                 styles.mealPeriodButton,
                 mealPeriod === 'lunch' && styles.mealPeriodButtonActive,
+                !isLunchAvailable() && styles.mealPeriodButtonDisabled,
               ]}
               onPress={() => setMealPeriod('lunch')}
+              disabled={!isLunchAvailable()}
             >
               <Text style={[
                 styles.mealPeriodText,
                 mealPeriod === 'lunch' && styles.mealPeriodTextActive,
+                !isLunchAvailable() && styles.mealPeriodTextDisabled,
               ]}>
                 Lunch
               </Text>
@@ -484,6 +500,14 @@ const styles = StyleSheet.create({
   },
   mealPeriodTextActive: {
     color: AppColors.background,
+  },
+  mealPeriodButtonDisabled: {
+    backgroundColor: AppColors.border,
+    borderColor: AppColors.border,
+    opacity: 0.5,
+  },
+  mealPeriodTextDisabled: {
+    color: AppColors.textMuted,
   },
   datePickerButton: {
     backgroundColor: AppColors.background,

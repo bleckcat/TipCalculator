@@ -81,6 +81,8 @@ export function calculateTips(
   totalPercentage: number;
   undistributedAmount: number;
   shiftAdjustments: {staffId: string, oldShift: number, newShift: number}[];
+  pool1BaseAmount: number;
+  pool1ExtraAmount: number;
   pool2BaseAmount: number;
   pool2ExtraAmount: number;
 } {
@@ -91,6 +93,8 @@ export function calculateTips(
       totalPercentage: 0,
       undistributedAmount: 0,
       shiftAdjustments: [],
+      pool1BaseAmount: 0,
+      pool1ExtraAmount: 0,
       pool2BaseAmount: 0,
       pool2ExtraAmount: 0,
     };
@@ -112,6 +116,7 @@ export function calculateTips(
 
   const calculationStaff: CalculationStaff[] = [];
   let totalDistributed = 0;
+  let pool1TotalDistributed = 0;
   let pool2TotalDistributed = 0;
 
   // Process Pool 1 (97%)
@@ -135,8 +140,13 @@ export function calculateTips(
       });
       
       totalDistributed += roundedAmount;
+      pool1TotalDistributed += roundedAmount;
     });
   }
+
+  // Calculate Pool 1 extra amount and remainder
+  const pool1ExtraAmount = pool1TotalDistributed > 0 ? Math.max(0, pool1TotalDistributed - pool1Amount) : 0;
+  const pool1Remainder = pool1TotalDistributed > 0 ? Math.max(0, pool1Amount - pool1TotalDistributed) : 0;
 
   // Process Pool 2 (3%)
   if (pool2Redistributed.length > 0) {
@@ -163,10 +173,13 @@ export function calculateTips(
     });
   }
 
+  // Calculate pool 2 extra amount needed
+  // First use any remainder from Pool 1, then use external money if needed
+  const pool2NeedsExtra = Math.max(0, pool2TotalDistributed - pool2Amount);
+  const pool2ExtraFromPool1 = Math.min(pool2NeedsExtra, pool1Remainder);
+  const pool2ExtraAmount = Math.max(0, pool2NeedsExtra - pool2ExtraFromPool1);
+
   const undistributedAmount = Math.max(0, totalAmount - totalDistributed);
-  
-  // Calculate pool 2 extra amount (due to rounding up)
-  const pool2ExtraAmount = pool2TotalDistributed > 0 ? pool2TotalDistributed - pool2Amount : 0;
 
   return {
     calculationStaff,
@@ -174,6 +187,8 @@ export function calculateTips(
     totalPercentage: 100,
     undistributedAmount,
     shiftAdjustments: [], // No longer needed since shifts are capped at 100%
+    pool1BaseAmount: pool1Amount,
+    pool1ExtraAmount,
     pool2BaseAmount: pool2Amount,
     pool2ExtraAmount,
   };
