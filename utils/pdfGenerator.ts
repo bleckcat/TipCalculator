@@ -9,11 +9,9 @@ export async function generateTipsPDF(
   date: string
 ) {
   const formattedDate = new Date(date).toLocaleDateString('en-US', {
-    month: 'long',
+    month: 'short',
     day: 'numeric',
     year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
   });
 
   const mealPeriodText = mealPeriod === 'lunch' ? 'Lunch' : 'Dinner';
@@ -28,65 +26,70 @@ export async function generateTipsPDF(
         <style>
           body {
             font-family: Arial, sans-serif;
-            padding: 20px;
+            padding: 10px;
             margin: 0;
           }
           .header {
             text-align: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
             border-bottom: 2px solid #333;
           }
           .header h1 {
             margin: 0;
-            font-size: 24px;
+            font-size: 18px;
             color: #333;
           }
           .header p {
-            margin: 5px 0;
+            margin: 3px 0;
             color: #666;
-            font-size: 14px;
+            font-size: 12px;
           }
           .tip-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 0;
             page-break-inside: avoid;
           }
           .tip-cell {
             border: 2px dashed #999;
-            padding: 20px;
-            min-height: 120px;
+            padding: 8px;
+            min-height: 70px;
             box-sizing: border-box;
             page-break-inside: avoid;
           }
           .tip-cell .name {
-            font-size: 18px;
+            font-size: 12px;
             font-weight: bold;
             color: #333;
-            margin-bottom: 10px;
+            margin-bottom: 4px;
             border-bottom: 1px solid #ddd;
-            padding-bottom: 8px;
+            padding-bottom: 3px;
           }
           .tip-cell .info {
-            font-size: 14px;
+            font-size: 9px;
             color: #666;
-            margin: 6px 0;
-            line-height: 1.6;
+            margin: 2px 0;
+            line-height: 1.3;
           }
           .tip-cell .amount {
-            font-size: 22px;
+            font-size: 14px;
             font-weight: bold;
             color: #2E7D32;
-            margin-top: 12px;
+            margin-top: 4px;
           }
           .tip-cell .role {
             color: #1976D2;
             font-weight: 600;
           }
+          .tip-cell .date {
+            font-size: 8px;
+            color: #999;
+            margin-top: 3px;
+          }
           @media print {
             body {
-              padding: 10px;
+              padding: 5px;
             }
             .tip-cell {
               page-break-inside: avoid;
@@ -95,8 +98,8 @@ export async function generateTipsPDF(
           .scissors-icon {
             text-align: center;
             color: #999;
-            font-size: 18px;
-            margin: 10px 0;
+            font-size: 14px;
+            margin: 5px 0;
           }
         </style>
       </head>
@@ -104,7 +107,7 @@ export async function generateTipsPDF(
         <div class="header">
           <h1>Tip Distribution - ${mealPeriodText}</h1>
           <p>${formattedDate}</p>
-          <p>Total Tips: $${totalAmount.toFixed(2)}</p>
+          <p>Total: $${totalAmount.toFixed(2)}</p>
         </div>
         
         <div class="scissors-icon">✂️ Cut along dotted lines ✂️</div>
@@ -115,17 +118,16 @@ export async function generateTipsPDF(
               (staff) => `
             <div class="tip-cell">
               <div class="name">${staff.staffName}</div>
-              <div class="info"><span class="role">${staff.role.name}</span></div>
-              <div class="info">Shift: ${staff.customPercentage}%</div>
-              <div class="info">Pool: ${staff.pool === 'pool1' ? '1 (97%)' : '2 (3%)'}</div>
+              <div class="info"><span class="role">${staff.role.name}</span> • ${staff.customPercentage}% • Pool ${staff.pool === 'pool1' ? '1' : '2'}</div>
               <div class="amount">$${staff.tipAmount.toFixed(2)}</div>
+              <div class="date">${formattedDate}</div>
             </div>
           `
             )
             .join('')}
         </div>
         
-        <div class="scissors-icon" style="margin-top: 20px;">✂️</div>
+        <div class="scissors-icon" style="margin-top: 10px;">✂️</div>
       </body>
     </html>
   `;

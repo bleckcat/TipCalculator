@@ -1,10 +1,12 @@
 import { AppColors } from '@/constants/theme';
 import { useApp } from '@/context/AppContext';
-import { CalculationStaff, Staff } from '@/types';
+import { CalculationStaff, DEFAULT_ROLES, Staff } from '@/types';
 import { calculateTips, formatCurrency, generateTipCalculationId } from '@/utils/tipCalculations';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import React, { useEffect, useState } from 'react';
 import {
   Alert,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -19,6 +21,10 @@ export default function CalculateTipScreen() {
   const [amountError, setAmountError] = useState('');
   const [mealPeriod, setMealPeriod] = useState<'lunch' | 'dinner'>('dinner');
   const [selectedStaffIds, setSelectedStaffIds] = useState<string[]>([]);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedRoleFilter, setSelectedRoleFilter] = useState<string>('all');
   const [calculationResult, setCalculationResult] = useState<{
     calculationStaff: CalculationStaff[];
     adjustedPercentages: boolean;
@@ -62,6 +68,13 @@ export default function CalculateTipScreen() {
     .map(id => state.staff.find(s => s.id === id))
     .filter((s): s is Staff => s !== undefined);
 
+  // Filter staff based on search query and role filter
+  const filteredStaff = state.staff.filter(staff => {
+    const matchesSearch = staff.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesRole = selectedRoleFilter === 'all' || staff.role.id === selectedRoleFilter;
+    return matchesSearch && matchesRole;
+  });
+
   useEffect(() => {
     if (isAmountValid && selectedStaff.length > 0) {
       const amount = parseFloat(totalAmount);
@@ -83,6 +96,13 @@ export default function CalculateTipScreen() {
     });
   };
 
+  const handleDateChange = (event: any, date?: Date) => {
+    setShowDatePicker(Platform.OS === 'ios');
+    if (date) {
+      setSelectedDate(date);
+    }
+  };
+
   const handleSaveCalculation = () => {
     if (!calculationResult || !totalAmount) {
       Alert.alert('Error', 'Please complete the calculation first');
@@ -91,7 +111,7 @@ export default function CalculateTipScreen() {
 
     const calculation = {
       id: generateTipCalculationId(),
-      date: new Date().toISOString(),
+      date: selectedDate.toISOString(),
       mealPeriod,
       totalTipAmount: parseFloat(totalAmount),
       staffMembers: calculationResult.calculationStaff,
@@ -105,6 +125,7 @@ export default function CalculateTipScreen() {
     setTotalAmount('');
     setSelectedStaffIds([]);
     setCalculationResult(null);
+    setSelectedDate(new Date());
     
     Alert.alert('Success', 'Tip calculation saved successfully!');
   };
@@ -158,6 +179,32 @@ export default function CalculateTipScreen() {
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
           <Text style={styles.title}>Calculate Tips</Text>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Date</Text>
+          <TouchableOpacity
+            style={styles.datePickerButton}
+            onPress={() => setShowDatePicker(true)}
+          >
+            <Text style={styles.datePickerText}>
+              {selectedDate.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              })}
+            </Text>
+          </TouchableOpacity>
+          {showDatePicker && (
+            <DateTimePicker
+              value={selectedDate}
+              mode="date"
+              display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+              onChange={handleDateChange}
+              maximumDate={new Date()}
+            />
+          )}
         </View>
 
         <View style={styles.section}>
@@ -218,14 +265,71 @@ export default function CalculateTipScreen() {
           <Text style={styles.sectionTitle}>
             Select Staff ({selectedStaff.length} selected)
           </Text>
+          
+          {state.staff.length > 0 && (
+            <>
+              <TextInput
+                style={styles.searchInput}
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+                placeholder="Search staff..."
+                placeholderTextColor="#666666"
+              />
+              
+              <ScrollView 
+                horizontal 
+                showsHorizontalScrollIndicator={false}
+                style={styles.filterContainer}
+              >
+                <TouchableOpacity
+                  style={[
+                    styles.filterChip,
+                    selectedRoleFilter === 'all' && styles.filterChipActive,
+                  ]}
+                  onPress={() => setSelectedRoleFilter('all')}
+                >
+                  <Text style={[
+                    styles.filterChipText,
+                    selectedRoleFilter === 'all' && styles.filterChipTextActive,
+                  ]}>
+                    All
+                  </Text>
+                </TouchableOpacity>
+                {DEFAULT_ROLES.map(role => (
+                  <TouchableOpacity
+                    key={role.id}
+                    style={[
+                      styles.filterChip,
+                      selectedRoleFilter === role.id && styles.filterChipActive,
+                    ]}
+                    onPress={() => setSelectedRoleFilter(role.id)}
+                  >
+                    <View style={[styles.filterChipDot, { backgroundColor: role.color }]} />
+                    <Text style={[
+                      styles.filterChipText,
+                      selectedRoleFilter === role.id && styles.filterChipTextActive,
+                    ]}>
+                      {role.name}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </>
+          )}
+          
           {state.staff.length === 0 ? (
             <View style={styles.emptyState}>
               <Text style={styles.emptyText}>No staff members available</Text>
               <Text style={styles.emptySubtext}>Go to Staff tab to add team members</Text>
             </View>
+          ) : filteredStaff.length === 0 ? (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyText}>No staff members found</Text>
+              <Text style={styles.emptySubtext}>Try adjusting your search or filter</Text>
+            </View>
           ) : (
             <View style={styles.staffList}>
-              {state.staff.map((item) => renderStaffItem({ item }))}
+              {filteredStaff.map((item) => renderStaffItem({ item }))}
             </View>
           )}
         </View>
@@ -379,6 +483,64 @@ const styles = StyleSheet.create({
     color: AppColors.textSecondary,
   },
   mealPeriodTextActive: {
+    color: AppColors.background,
+  },
+  datePickerButton: {
+    backgroundColor: AppColors.background,
+    borderWidth: 2,
+    borderColor: AppColors.border,
+    borderRadius: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+  },
+  datePickerText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: AppColors.text,
+    textAlign: 'center',
+  },
+  searchInput: {
+    backgroundColor: AppColors.background,
+    borderWidth: 2,
+    borderColor: AppColors.border,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: AppColors.text,
+    marginBottom: 12,
+  },
+  filterContainer: {
+    marginBottom: 15,
+    flexGrow: 0,
+  },
+  filterChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: AppColors.background,
+    borderWidth: 2,
+    borderColor: AppColors.border,
+    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    marginRight: 10,
+  },
+  filterChipActive: {
+    backgroundColor: AppColors.primary,
+    borderColor: AppColors.primary,
+  },
+  filterChipDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    marginRight: 8,
+  },
+  filterChipText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: AppColors.text,
+  },
+  filterChipTextActive: {
     color: AppColors.background,
   },
   poolHeader: {

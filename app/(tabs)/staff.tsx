@@ -19,6 +19,8 @@ export default function StaffScreen() {
   const { state, addStaff, updateStaff, removeStaff, getRoles } = useApp();
   const [modalVisible, setModalVisible] = useState(false);
   const [editingStaff, setEditingStaff] = useState<Staff | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedRoleFilter, setSelectedRoleFilter] = useState<string>('all');
   const [formData, setFormData] = useState({
     name: '',
     roleId: '',
@@ -32,6 +34,13 @@ export default function StaffScreen() {
   });
 
   const roles = getRoles();
+
+  // Filter staff based on search query and role filter
+  const filteredStaff = state.staff.filter(staff => {
+    const matchesSearch = staff.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesRole = selectedRoleFilter === 'all' || staff.role.id === selectedRoleFilter;
+    return matchesSearch && matchesRole;
+  });
 
   const validateName = (name: string): string => {
     if (!name.trim()) {
@@ -193,16 +202,73 @@ export default function StaffScreen() {
         </TouchableOpacity>
       </View>
 
+      {state.staff.length > 0 && (
+        <View style={styles.filterSection}>
+          <TextInput
+            style={styles.searchInput}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            placeholder="Search staff..."
+            placeholderTextColor="#666666"
+          />
+          
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false}
+            style={styles.filterContainer}
+          >
+            <TouchableOpacity
+              style={[
+                styles.filterChip,
+                selectedRoleFilter === 'all' && styles.filterChipActive,
+              ]}
+              onPress={() => setSelectedRoleFilter('all')}
+            >
+              <Text style={[
+                styles.filterChipText,
+                selectedRoleFilter === 'all' && styles.filterChipTextActive,
+              ]}>
+                All
+              </Text>
+            </TouchableOpacity>
+            {roles.map(role => (
+              <TouchableOpacity
+                key={role.id}
+                style={[
+                  styles.filterChip,
+                  selectedRoleFilter === role.id && styles.filterChipActive,
+                ]}
+                onPress={() => setSelectedRoleFilter(role.id)}
+              >
+                <View style={[styles.filterChipDot, { backgroundColor: role.color }]} />
+                <Text style={[
+                  styles.filterChipText,
+                  selectedRoleFilter === role.id && styles.filterChipTextActive,
+                ]}>
+                  {role.name}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
+      )}
+
       <FlatList
-        data={state.staff}
+        data={filteredStaff}
         renderItem={renderStaffItem}
         keyExtractor={item => item.id}
         style={styles.list}
         contentContainerStyle={styles.listContent}
         ListEmptyComponent={
           <View style={styles.emptyState}>
-            <Text style={styles.emptyText}>No staff members added yet</Text>
-            <Text style={styles.emptySubtext}>Tap &quot;Add Staff&quot; to get started</Text>
+            <Text style={styles.emptyText}>
+              {state.staff.length === 0 ? 'No staff members added yet' : 'No staff members found'}
+            </Text>
+            <Text style={styles.emptySubtext}>
+              {state.staff.length === 0 
+                ? 'Tap "Add Staff" to get started' 
+                : 'Try adjusting your search or filter'}
+            </Text>
           </View>
         }
       />
@@ -332,6 +398,58 @@ const styles = StyleSheet.create({
     color: AppColors.background,
     fontWeight: '700',
     fontSize: 14,
+  },
+  filterSection: {
+    backgroundColor: AppColors.card,
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: AppColors.border,
+  },
+  searchInput: {
+    backgroundColor: AppColors.background,
+    borderWidth: 2,
+    borderColor: AppColors.border,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: AppColors.text,
+    marginBottom: 12,
+  },
+  filterContainer: {
+    marginBottom: 10,
+    flexGrow: 0,
+  },
+  filterChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: AppColors.background,
+    borderWidth: 2,
+    borderColor: AppColors.border,
+    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    marginRight: 10,
+  },
+  filterChipActive: {
+    backgroundColor: AppColors.primary,
+    borderColor: AppColors.primary,
+  },
+  filterChipDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    marginRight: 8,
+  },
+  filterChipText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: AppColors.text,
+  },
+  filterChipTextActive: {
+    color: AppColors.background,
   },
   list: {
     flex: 1,
