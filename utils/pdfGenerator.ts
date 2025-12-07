@@ -117,7 +117,7 @@ export async function generateTipsPDF(
             .map(
               (staff) => `
             <div class="tip-cell">
-              <div class="name">${staff.staffName}</div>
+              <div class="name">${staff.staffName} <span style="font-size: 10px; font-weight: normal; color: #666;">(${mealPeriodText})</span></div>
               <div class="info"><span class="role">${staff.role.name}</span> • ${staff.customPercentage}% • Pool ${staff.pool === 'pool1' ? '1' : '2'}</div>
               <div class="amount">$${staff.tipAmount.toFixed(2)}</div>
               <div class="date">${formattedDate}</div>
@@ -137,6 +137,8 @@ export async function generateTipsPDF(
     const { uri } = await Print.printToFileAsync({
       html: htmlContent,
       base64: false,
+      width: 595,
+      height: 842,
     });
 
     // Share/Save the PDF
