@@ -46,7 +46,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="user"
         options={{
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.circle.fill" color={color} />,
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="chart.line.uptrend.xyaxis" color={color} />,
         }}
       />
       <Tabs.Screen

@@ -23,6 +23,7 @@ const MAPPING = {
   'person.circle.fill': 'account-circle',
   'gearshape.fill': 'settings',
   'clock.fill': 'history',
+  'chart.line.uptrend.xyaxis': 'show-chart',
 } as IconMapping;
 
 /**

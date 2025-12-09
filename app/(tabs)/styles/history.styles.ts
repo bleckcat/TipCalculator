@@ -1,0 +1,300 @@
+import { getThemeColors } from '@/constants/theme';
+import { StyleSheet } from 'react-native';
+
+export const createStyles = (colors: ReturnType<typeof getThemeColors>) => StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  header: {
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    backgroundColor: colors.card,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: colors.text,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    paddingBottom: 100,
+  },
+  emptyState: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 100,
+  },
+  emptyStateIcon: {
+    fontSize: 64,
+    marginBottom: 20,
+  },
+  emptyStateText: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: colors.text,
+    marginBottom: 8,
+  },
+  emptyStateSubtext: {
+    fontSize: 14,
+    color: colors.textSecondary,
+    textAlign: "center",
+  },
+  historyCard: {
+    backgroundColor: colors.card,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  cardHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    marginBottom: 12,
+  },
+  dateContainer: {
+    flex: 1,
+  },
+  dateText: {
+    fontSize: 14,
+    color: colors.textSecondary,
+    marginBottom: 4,
+  },
+  mealPeriodBadge: {
+    fontSize: 12,
+    color: colors.primary,
+    fontWeight: "600",
+  },
+  totalAmount: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: colors.primary,
+  },
+  poolsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: 12,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+    marginBottom: 8,
+  },
+  poolInfo: {
+    flex: 1,
+  },
+  poolLabel: {
+    fontSize: 12,
+    color: colors.textSecondary,
+    marginBottom: 4,
+  },
+  poolAmount: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: colors.text,
+  },
+  staffCount: {
+    alignItems: "center",
+  },
+  staffCountText: {
+    fontSize: 12,
+    color: colors.textSecondary,
+  },
+  modalOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: "flex-end",
+    zIndex: 1000,
+  },
+  modalBackdrop: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContent: {
+    backgroundColor: colors.card,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: "80%",
+    paddingBottom: 40,
+    zIndex: 1001,
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: colors.text,
+  },
+  closeButton: {
+    padding: 5,
+  },
+  closeButtonText: {
+    fontSize: 24,
+    color: colors.textSecondary,
+    fontWeight: "300",
+  },
+  modalScrollView: {
+    maxHeight: "100%",
+  },
+  modalInfo: {
+    padding: 20,
+    alignItems: "center",
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  modalDate: {
+    fontSize: 14,
+    color: colors.textSecondary,
+    marginBottom: 5,
+  },
+  modalMealPeriod: {
+    fontSize: 14,
+    color: colors.primary,
+    fontWeight: "600",
+    marginBottom: 8,
+  },
+  modalTotal: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: colors.primary,
+  },
+  modalUndistributed: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: colors.warning,
+    marginTop: 8,
+  },
+  tableContainer: {
+    paddingHorizontal: 20,
+    paddingTop: 15,
+  },
+  tableHeader: {
+    flexDirection: "row",
+    paddingVertical: 12,
+    borderBottomWidth: 2,
+    borderBottomColor: colors.border,
+    marginBottom: 8,
+  },
+  tableHeaderText: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: colors.text,
+  },
+  tableRow: {
+    flexDirection: "row",
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+    alignItems: "center",
+  },
+  tableRowLast: {
+    borderBottomWidth: 0,
+  },
+  tableCell: {
+    fontSize: 14,
+    color: colors.text,
+  },
+  nameColumn: {
+    flex: 2,
+  },
+  roleColumn: {
+    flex: 2,
+  },
+  tipColumn: {
+    flex: 1,
+    textAlign: "right",
+  },
+  roleCell: {
+    alignItems: "flex-start",
+  },
+  roleBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  roleText: {
+    fontSize: 12,
+    fontWeight: "600",
+  },
+  tipAmount: {
+    fontWeight: "600",
+    color: colors.primary,
+  },
+  modalActions: {
+    flexDirection: 'row',
+    marginHorizontal: 20,
+    marginTop: 15,
+    marginBottom: 5,
+    gap: 10,
+  },
+  editButton: {
+    flex: 1,
+    backgroundColor: colors.primary,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 6,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  editButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  deleteButton: {
+    flex: 1,
+    backgroundColor: colors.error,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 6,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  deleteButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  exportButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    borderWidth: 1.5,
+    borderColor: colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
