@@ -16,6 +16,10 @@ export async function generateTipsPDF(
 
   const mealPeriodText = mealPeriod === 'lunch' ? 'Lunch' : 'Dinner';
 
+  // Calculate total distributed and surplus
+  const totalDistributed = staffMembers.reduce((sum, staff) => sum + staff.tipAmount, 0);
+  const surplus = totalAmount - totalDistributed;
+
   // Generate HTML for the PDF with dotted borders for cutting
   const htmlContent = `
     <!DOCTYPE html>
@@ -87,6 +91,67 @@ export async function generateTipsPDF(
             color: #999;
             margin-top: 3px;
           }
+          .summary-section {
+            margin-top: 20px;
+            padding: 10px;
+            border: 2px solid #333;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+          }
+          .summary-section h2 {
+            margin: 0 0 5px 0;
+            font-size: 14px;
+            color: #333;
+            border-bottom: 2px solid #2E7D32;
+            padding-bottom: 3px;
+          }
+          .summary-info {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 8px;
+            background-color: #fff;
+            border-bottom: 1px solid #ddd;
+          }
+          .summary-info:last-of-type {
+            border-bottom: 2px solid #333;
+          }
+          .summary-info .label {
+            font-weight: bold;
+            color: #666;
+            font-size: 11px;
+          }
+          .summary-info .value {
+            font-weight: bold;
+            color: #2E7D32;
+            font-size: 11px;
+          }
+          .staff-list {
+            background-color: #fff;
+            padding: 8px;
+            margin-top: 0;
+          }
+          .staff-list h3 {
+            margin: 0 0 5px 0;
+            font-size: 11px;
+            color: #666;
+            font-weight: 600;
+          }
+          .staff-list-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 0;
+            font-size: 9px;
+            border-top: 1px solid #ddd;
+          }
+          .staff-list-item {
+            padding: 3px 5px;
+            border-bottom: 1px solid #ddd;
+            border-right: 1px solid #ddd;
+            color: #333;
+          }
+          .staff-list-item:nth-child(6n) {
+            border-right: none;
+          }
           @media print {
             body {
               padding: 5px;
@@ -128,6 +193,35 @@ export async function generateTipsPDF(
         </div>
         
         <div class="scissors-icon" style="margin-top: 10px;">✂️</div>
+        
+        <div class="summary-section">
+          <h2>Summary</h2>
+          <div class="summary-info">
+            <span class="label">Total Tips:</span>
+            <span class="value">$${totalAmount.toFixed(2)}</span>
+          </div>
+          <div class="summary-info">
+            <span class="label">Total Distributed:</span>
+            <span class="value">$${totalDistributed.toFixed(2)}</span>
+          </div>
+          <div class="summary-info">
+            <span class="label">Surplus (Not Distributed):</span>
+            <span class="value">$${surplus.toFixed(2)}</span>
+          </div>
+          
+          <div class="staff-list">
+            <h3>Staff Included (${staffMembers.length} people):</h3>
+            <div class="staff-list-grid">
+              ${staffMembers
+                .map(
+                  (staff) => `
+                <div class="staff-list-item">${staff.staffName}</div>
+              `
+                )
+                .join('')}
+            </div>
+          </div>
+        </div>
       </body>
     </html>
   `;

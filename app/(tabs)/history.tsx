@@ -1,23 +1,27 @@
-import { AppColors } from "@/constants/theme";
+import { getThemeColors } from "@/constants/theme";
 import { useApp } from "@/context/AppContext";
+import { useTheme } from '@/hooks/use-theme';
 import { TipCalculation } from "@/types";
 import { generateTipsPDF } from "@/utils/pdfGenerator";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import React, { useEffect, useState } from "react";
 import {
-  Alert,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    Alert,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function HistoryScreen() {
   const { state, removeTipCalculation } = useApp();
+  const { colors } = useTheme();
   const [selectedCalculation, setSelectedCalculation] =
     useState<TipCalculation | null>(null);
+
+  const styles = createStyles(colors);
 
   // Close modal if selected calculation no longer exists
   useEffect(() => {
@@ -128,7 +132,7 @@ export default function HistoryScreen() {
                         handleExportPDF(calculation);
                       }}
                     >
-                      <MaterialIcons name="picture-as-pdf" size={20} color={AppColors.primary} />
+                      <MaterialIcons name="picture-as-pdf" size={20} color={colors.primary} />
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -258,22 +262,22 @@ export default function HistoryScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ReturnType<typeof getThemeColors>) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: AppColors.background,
+    backgroundColor: colors.background,
   },
   header: {
     paddingHorizontal: 20,
     paddingVertical: 15,
-    backgroundColor: AppColors.card,
+    backgroundColor: colors.card,
     borderBottomWidth: 1,
-    borderBottomColor: AppColors.border,
+    borderBottomColor: colors.border,
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    color: AppColors.text,
+    color: colors.text,
   },
   scrollView: {
     flex: 1,
@@ -296,16 +300,16 @@ const styles = StyleSheet.create({
   emptyStateText: {
     fontSize: 18,
     fontWeight: "600",
-    color: AppColors.text,
+    color: colors.text,
     marginBottom: 8,
   },
   emptyStateSubtext: {
     fontSize: 14,
-    color: AppColors.textSecondary,
+    color: colors.textSecondary,
     textAlign: "center",
   },
   historyCard: {
-    backgroundColor: AppColors.card,
+    backgroundColor: colors.card,
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
@@ -326,27 +330,27 @@ const styles = StyleSheet.create({
   },
   dateText: {
     fontSize: 14,
-    color: AppColors.textSecondary,
+    color: colors.textSecondary,
     marginBottom: 4,
   },
   mealPeriodBadge: {
     fontSize: 12,
-    color: AppColors.primary,
+    color: colors.primary,
     fontWeight: "600",
   },
   totalAmount: {
     fontSize: 24,
     fontWeight: "bold",
-    color: AppColors.primary,
+    color: colors.primary,
   },
   poolsContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     paddingVertical: 12,
     borderTopWidth: 1,
-    borderTopColor: AppColors.border,
+    borderTopColor: colors.border,
     borderBottomWidth: 1,
-    borderBottomColor: AppColors.border,
+    borderBottomColor: colors.border,
     marginBottom: 8,
   },
   poolInfo: {
@@ -354,20 +358,20 @@ const styles = StyleSheet.create({
   },
   poolLabel: {
     fontSize: 12,
-    color: AppColors.textSecondary,
+    color: colors.textSecondary,
     marginBottom: 4,
   },
   poolAmount: {
     fontSize: 16,
     fontWeight: "600",
-    color: AppColors.text,
+    color: colors.text,
   },
   staffCount: {
     alignItems: "center",
   },
   staffCountText: {
     fontSize: 12,
-    color: AppColors.textSecondary,
+    color: colors.textSecondary,
   },
   modalOverlay: {
     position: "absolute",
@@ -387,7 +391,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
-    backgroundColor: AppColors.card,
+    backgroundColor: colors.card,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     maxHeight: "80%",
@@ -401,19 +405,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 15,
     borderBottomWidth: 1,
-    borderBottomColor: AppColors.border,
+    borderBottomColor: colors.border,
   },
   modalTitle: {
     fontSize: 20,
     fontWeight: "bold",
-    color: AppColors.text,
+    color: colors.text,
   },
   closeButton: {
     padding: 5,
   },
   closeButtonText: {
     fontSize: 24,
-    color: AppColors.textSecondary,
+    color: colors.textSecondary,
     fontWeight: "300",
   },
   modalScrollView: {
@@ -423,23 +427,23 @@ const styles = StyleSheet.create({
     padding: 20,
     alignItems: "center",
     borderBottomWidth: 1,
-    borderBottomColor: AppColors.border,
+    borderBottomColor: colors.border,
   },
   modalDate: {
     fontSize: 14,
-    color: AppColors.textSecondary,
+    color: colors.textSecondary,
     marginBottom: 5,
   },
   modalMealPeriod: {
     fontSize: 14,
-    color: AppColors.primary,
+    color: colors.primary,
     fontWeight: "600",
     marginBottom: 8,
   },
   modalTotal: {
     fontSize: 28,
     fontWeight: "bold",
-    color: AppColors.primary,
+    color: colors.primary,
   },
   tableContainer: {
     paddingHorizontal: 20,
@@ -449,19 +453,19 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     paddingVertical: 12,
     borderBottomWidth: 2,
-    borderBottomColor: AppColors.border,
+    borderBottomColor: colors.border,
     marginBottom: 8,
   },
   tableHeaderText: {
     fontSize: 14,
     fontWeight: "bold",
-    color: AppColors.text,
+    color: colors.text,
   },
   tableRow: {
     flexDirection: "row",
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: AppColors.border,
+    borderBottomColor: colors.border,
     alignItems: "center",
   },
   tableRowLast: {
@@ -469,7 +473,7 @@ const styles = StyleSheet.create({
   },
   tableCell: {
     fontSize: 14,
-    color: AppColors.text,
+    color: colors.text,
   },
   nameColumn: {
     flex: 2,
@@ -495,10 +499,10 @@ const styles = StyleSheet.create({
   },
   tipAmount: {
     fontWeight: "600",
-    color: AppColors.primary,
+    color: colors.primary,
   },
   deleteButton: {
-    backgroundColor: AppColors.error,
+    backgroundColor: colors.error,
     marginHorizontal: 20,
     marginTop: 15,
     marginBottom: 5,
@@ -524,7 +528,7 @@ const styles = StyleSheet.create({
     height: 36,
     borderRadius: 18,
     borderWidth: 1.5,
-    borderColor: AppColors.primary,
+    borderColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },

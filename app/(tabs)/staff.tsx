@@ -1,5 +1,6 @@
-import { AppColors } from '@/constants/theme';
+import { getThemeColors } from '@/constants/theme';
 import { useApp } from '@/context/AppContext';
+import { useTheme } from '@/hooks/use-theme';
 import { Staff, StaffRole } from '@/types';
 import React, { useState } from 'react';
 import {
@@ -17,6 +18,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function StaffScreen() {
   const { state, addStaff, updateStaff, removeStaff, getRoles } = useApp();
+  const { colors } = useTheme();
   const [modalVisible, setModalVisible] = useState(false);
   const [editingStaff, setEditingStaff] = useState<Staff | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -34,6 +36,8 @@ export default function StaffScreen() {
   });
 
   const roles = getRoles();
+
+  const styles = createStyles(colors);
 
   // Filter staff based on search query and role filter
   const filteredStaff = state.staff.filter(staff => {
@@ -194,7 +198,7 @@ export default function StaffScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.header}>
         <Text style={styles.title}>Staff Management</Text>
         <TouchableOpacity style={styles.addButton} onPress={() => openModal()}>
@@ -363,10 +367,9 @@ export default function StaffScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ReturnType<typeof getThemeColors>) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: AppColors.background,
   },
   header: {
     flexDirection: 'row',
@@ -374,48 +377,48 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 20,
-    backgroundColor: AppColors.card,
+    backgroundColor: colors.card,
     borderBottomWidth: 1,
-    borderBottomColor: AppColors.border,
+    borderBottomColor: colors.border,
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: AppColors.text,
+    color: colors.text,
   },
   addButton: {
-    backgroundColor: AppColors.primary,
+    backgroundColor: colors.primary,
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 12,
-    shadowColor: AppColors.primary,
+    shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
     elevation: 3,
   },
   addButtonText: {
-    color: AppColors.background,
+    color: colors.background,
     fontWeight: '700',
     fontSize: 14,
   },
   filterSection: {
-    backgroundColor: AppColors.card,
+    backgroundColor: colors.card,
     paddingHorizontal: 16,
     paddingTop: 16,
     paddingBottom: 10,
     borderBottomWidth: 1,
-    borderBottomColor: AppColors.border,
+    borderBottomColor: colors.border,
   },
   searchInput: {
-    backgroundColor: AppColors.background,
+    backgroundColor: colors.background,
     borderWidth: 2,
-    borderColor: AppColors.border,
+    borderColor: colors.border,
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 12,
     fontSize: 16,
-    color: AppColors.text,
+    color: colors.text,
     marginBottom: 12,
   },
   filterContainer: {
@@ -425,17 +428,17 @@ const styles = StyleSheet.create({
   filterChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: AppColors.background,
+    backgroundColor: colors.background,
     borderWidth: 2,
-    borderColor: AppColors.border,
+    borderColor: colors.border,
     borderRadius: 20,
     paddingVertical: 8,
     paddingHorizontal: 16,
     marginRight: 10,
   },
   filterChipActive: {
-    backgroundColor: AppColors.primary,
-    borderColor: AppColors.primary,
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
   },
   filterChipDot: {
     width: 10,
@@ -446,10 +449,10 @@ const styles = StyleSheet.create({
   filterChipText: {
     fontSize: 14,
     fontWeight: '600',
-    color: AppColors.text,
+    color: colors.text,
   },
   filterChipTextActive: {
-    color: AppColors.background,
+    color: colors.background,
   },
   list: {
     flex: 1,
@@ -460,7 +463,7 @@ const styles = StyleSheet.create({
     paddingTop: 10,
   },
   staffItem: {
-    backgroundColor: AppColors.card,
+    backgroundColor: colors.card,
     borderRadius: 12,
     padding: 18,
     marginVertical: 6,
@@ -468,7 +471,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: AppColors.border,
+    borderColor: colors.border,
   },
   staffInfo: {
     flex: 1,
@@ -476,17 +479,17 @@ const styles = StyleSheet.create({
   staffName: {
     fontSize: 18,
     fontWeight: '600',
-    color: AppColors.text,
+    color: colors.text,
     marginBottom: 6,
   },
   staffRole: {
     fontSize: 14,
-    color: AppColors.textSecondary,
+    color: colors.textSecondary,
     marginBottom: 4,
   },
   basePercentage: {
     fontSize: 12,
-    color: AppColors.textMuted,
+    color: colors.textMuted,
   },
   staffActions: {
     flexDirection: 'row',
@@ -498,13 +501,13 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   editButton: {
-    backgroundColor: AppColors.primaryLight,
+    backgroundColor: colors.primaryLight,
   },
   deleteButton: {
-    backgroundColor: AppColors.error,
+    backgroundColor: colors.error,
   },
   actionButtonText: {
-    color: AppColors.background,
+    color: colors.background,
     fontSize: 12,
     fontWeight: '700',
   },
@@ -515,16 +518,16 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 18,
-    color: AppColors.textSecondary,
+    color: colors.textSecondary,
     marginBottom: 8,
   },
   emptySubtext: {
     fontSize: 14,
-    color: AppColors.textMuted,
+    color: colors.textMuted,
   },
   modalContainer: {
     flex: 1,
-    backgroundColor: AppColors.background,
+    backgroundColor: colors.background,
   },
   modalHeader: {
     flexDirection: 'row',
@@ -533,20 +536,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 20,
     borderBottomWidth: 1,
-    borderBottomColor: AppColors.border,
-    backgroundColor: AppColors.card,
+    borderBottomColor: colors.border,
+    backgroundColor: colors.card,
   },
   modalTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: AppColors.text,
+    color: colors.text,
   },
   cancelButton: {
-    color: AppColors.textMuted,
+    color: colors.textMuted,
     fontSize: 16,
   },
   saveButton: {
-    color: AppColors.primary,
+    color: colors.primary,
     fontSize: 16,
     fontWeight: '700',
   },
@@ -564,21 +567,21 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     fontWeight: '600',
-    color: AppColors.text,
+    color: colors.text,
     marginBottom: 10,
   },
   textInput: {
-    backgroundColor: AppColors.background,
+    backgroundColor: colors.background,
     borderWidth: 2,
-    borderColor: AppColors.border,
+    borderColor: colors.border,
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 12,
     fontSize: 16,
-    color: AppColors.text,
+    color: colors.text,
   },
   inputError: {
-    borderColor: AppColors.error,
+    borderColor: colors.error,
     borderWidth: 2,
   },
   shiftInputRow: {
@@ -591,33 +594,33 @@ const styles = StyleSheet.create({
   shiftInputLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: AppColors.textSecondary,
+    color: colors.textSecondary,
     marginBottom: 8,
   },
   shiftInput: {
-    backgroundColor: AppColors.background,
+    backgroundColor: colors.background,
     borderWidth: 2,
-    borderColor: AppColors.border,
+    borderColor: colors.border,
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 12,
     fontSize: 16,
-    color: AppColors.text,
+    color: colors.text,
     textAlign: 'center',
   },
   shiftInputError: {
-    borderColor: AppColors.error,
+    borderColor: colors.error,
     borderWidth: 2,
   },
   errorText: {
     fontSize: 12,
-    color: AppColors.error,
+    color: colors.error,
     marginTop: 6,
     fontWeight: '600',
   },
   helperText: {
     fontSize: 12,
-    color: AppColors.textMuted,
+    color: colors.textMuted,
     marginTop: 6,
   },
   rolesContainer: {
@@ -626,17 +629,17 @@ const styles = StyleSheet.create({
   roleOption: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: AppColors.background,
+    backgroundColor: colors.background,
     paddingHorizontal: 18,
     paddingVertical: 16,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: AppColors.border,
+    borderColor: colors.border,
   },
   selectedRole: {
-    borderColor: AppColors.primary,
-    backgroundColor: AppColors.card,
-    shadowColor: AppColors.primary,
+    borderColor: colors.primary,
+    backgroundColor: colors.card,
+    shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
@@ -652,11 +655,11 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     fontWeight: '600',
-    color: AppColors.text,
+    color: colors.text,
   },
   rolePercentage: {
     fontSize: 15,
-    color: AppColors.primary,
+    color: colors.primary,
     fontWeight: '700',
   },
 });

@@ -1,4 +1,5 @@
-import { AppColors } from '@/constants/theme';
+import { getThemeColors } from '@/constants/theme';
+import { useApp } from '@/context/AppContext';
 import React from 'react';
 import {
   ScrollView,
@@ -10,33 +11,48 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function ConfigurationScreen() {
+  const { state, toggleTheme } = useApp();
+  const colors = getThemeColors(state.theme);
+
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Configuration</Text>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: colors.border }]}>
+        <Text style={[styles.title, { color: colors.text }]}>Configuration</Text>
       </View>
 
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>About</Text>
+        <View style={[styles.section, { backgroundColor: colors.card }]}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Appearance</Text>
+          <TouchableOpacity 
+            style={[styles.themeButton, { backgroundColor: colors.primary }]}
+            onPress={toggleTheme}
+          >
+            <Text style={styles.themeButtonText}>
+              {state.theme === 'light' ? '🌙 Switch to Dark Mode' : '☀️ Switch to Light Mode'}
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={[styles.section, { backgroundColor: colors.card }]}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>About</Text>
           <View style={styles.aboutContainer}>
-            <Text style={styles.appName}>Tip Calculator</Text>
-            <Text style={styles.appVersion}>Version 1.0.0</Text>
-            <Text style={styles.appDescription}>
+            <Text style={[styles.appName, { color: colors.text }]}>Tip Calculator</Text>
+            <Text style={[styles.appVersion, { color: colors.textSecondary }]}>Version 1.0.0</Text>
+            <Text style={[styles.appDescription, { color: colors.textSecondary }]}>
               A professional tip calculation app for restaurant staff management.
               Calculate and distribute tips fairly based on roles and shift percentages.
             </Text>
             
             <TouchableOpacity style={styles.linkButton}>
-              <Text style={styles.linkButtonText}>📋 View Terms of Service</Text>
+              <Text style={[styles.linkButtonText, { color: colors.primary }]}>📋 View Terms of Service</Text>
             </TouchableOpacity>
             
             <TouchableOpacity style={styles.linkButton}>
-              <Text style={styles.linkButtonText}>🔒 Privacy Policy</Text>
+              <Text style={[styles.linkButtonText, { color: colors.primary }]}>🔒 Privacy Policy</Text>
             </TouchableOpacity>
             
             <TouchableOpacity style={styles.linkButton}>
-              <Text style={styles.linkButtonText}>📧 Contact Support</Text>
+              <Text style={[styles.linkButtonText, { color: colors.primary }]}>📧 Contact Support</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -48,19 +64,15 @@ export default function ConfigurationScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: AppColors.background,
   },
   header: {
     paddingHorizontal: 20,
     paddingVertical: 15,
-    backgroundColor: AppColors.card,
     borderBottomWidth: 1,
-    borderBottomColor: AppColors.border,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: AppColors.text,
   },
   scrollView: {
     flex: 1,
@@ -69,7 +81,6 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   section: {
-    backgroundColor: AppColors.card,
     marginTop: 10,
     paddingHorizontal: 20,
     paddingVertical: 15,
@@ -77,8 +88,19 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: AppColors.text,
     marginBottom: 15,
+  },
+  themeButton: {
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  themeButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FFFFFF',
   },
   aboutContainer: {
     alignItems: 'center',
@@ -87,17 +109,14 @@ const styles = StyleSheet.create({
   appName: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: AppColors.text,
     marginBottom: 5,
   },
   appVersion: {
     fontSize: 16,
-    color: AppColors.textSecondary,
     marginBottom: 15,
   },
   appDescription: {
     fontSize: 14,
-    color: AppColors.textSecondary,
     textAlign: 'center',
     lineHeight: 20,
     marginBottom: 30,
@@ -109,7 +128,6 @@ const styles = StyleSheet.create({
   },
   linkButtonText: {
     fontSize: 16,
-    color: AppColors.primary,
     fontWeight: '500',
   },
 });

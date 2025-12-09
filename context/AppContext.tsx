@@ -7,6 +7,7 @@ interface AppState {
   staff: Staff[];
   tipCalculations: TipCalculation[];
   currentUser: string | null;
+  theme: 'light' | 'dark';
 }
 
 interface AppContextType {
@@ -19,6 +20,7 @@ interface AppContextType {
   addTipCalculation: (calculation: TipCalculation) => void;
   removeTipCalculation: (calculationId: string) => void;
   getRoles: () => StaffRole[];
+  toggleTheme: () => void;
 }
 
 type AppAction = 
@@ -29,13 +31,15 @@ type AppAction =
   | { type: 'REMOVE_STAFF'; payload: string }
   | { type: 'ADD_TIP_CALCULATION'; payload: TipCalculation }
   | { type: 'REMOVE_TIP_CALCULATION'; payload: string }
-  | { type: 'LOAD_STATE'; payload: Partial<AppState> };
+  | { type: 'LOAD_STATE'; payload: Partial<AppState> }
+  | { type: 'TOGGLE_THEME' };
 
 const initialState: AppState = {
   isLoggedIn: false,
   staff: [],
   tipCalculations: [],
   currentUser: null,
+  theme: 'light',
 };
 
 function appReducer(state: AppState, action: AppAction): AppState {
@@ -83,6 +87,11 @@ function appReducer(state: AppState, action: AppAction): AppState {
       return {
         ...state,
         ...action.payload,
+      };
+    case 'TOGGLE_THEME':
+      return {
+        ...state,
+        theme: state.theme === 'light' ? 'dark' : 'light',
       };
     default:
       return state;
@@ -143,6 +152,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         const dataToSave = {
           staff: state.staff,
           tipCalculations: state.tipCalculations,
+          theme: state.theme,
         };
         await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
       } catch (error) {
@@ -150,7 +160,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }
     };
     saveData();
-  }, [state.staff, state.tipCalculations]);
+  }, [state.staff, state.tipCalculations, state.theme]);
 
   const login = (username: string, password: string) => {
     // For demo purposes, accept any credentials
@@ -185,6 +195,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const getRoles = () => DEFAULT_ROLES;
 
+  const toggleTheme = () => {
+    dispatch({ type: 'TOGGLE_THEME' });
+  };
+
   return (
     <AppContext.Provider value={{
       state,
@@ -196,6 +210,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       addTipCalculation,
       removeTipCalculation,
       getRoles,
+      toggleTheme,
     }}>
       {children}
     </AppContext.Provider>

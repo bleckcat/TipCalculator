@@ -1,22 +1,26 @@
-import { AppColors } from '@/constants/theme';
+import { getThemeColors } from '@/constants/theme';
 import { useApp } from '@/context/AppContext';
+import { useTheme } from '@/hooks/use-theme';
 import React, { useState } from 'react';
 import {
-  Alert,
-  Image,
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    Alert,
+    Image,
+    KeyboardAvoidingView,
+    Platform,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 
 export default function LoginScreen() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const { login } = useApp();
+  const { colors } = useTheme();
+
+  const styles = createStyles(colors);
 
   const handleLogin = () => {
     if (!username.trim() || !password.trim()) {
@@ -52,7 +56,7 @@ export default function LoginScreen() {
               value={username}
               onChangeText={setUsername}
               placeholder="Enter your username"
-              placeholderTextColor={AppColors.textMuted}
+              placeholderTextColor={colors.textMuted}
               autoCapitalize="none"
               autoCorrect={false}
             />
@@ -65,7 +69,7 @@ export default function LoginScreen() {
               value={password}
               onChangeText={setPassword}
               placeholder="Enter your password"
-              placeholderTextColor={AppColors.textMuted}
+              placeholderTextColor={colors.textMuted}
               secureTextEntry
               autoCapitalize="none"
               autoCorrect={false}
@@ -85,10 +89,10 @@ export default function LoginScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ReturnType<typeof getThemeColors>) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: AppColors.background,
+    backgroundColor: colors.background,
   },
   content: {
     flex: 1,
@@ -111,13 +115,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: AppColors.text,
+    color: colors.text,
     textAlign: 'center',
     marginBottom: 10,
   },
   subtitle: {
     fontSize: 16,
-    color: AppColors.textSecondary,
+    color: colors.textSecondary,
     textAlign: 'center',
   },
   formContainer: {
@@ -129,46 +133,46 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     fontWeight: '600',
-    color: AppColors.text,
+    color: colors.text,
     marginBottom: 8,
   },
   input: {
-    backgroundColor: AppColors.card,
+    backgroundColor: colors.card,
     borderWidth: 1,
-    borderColor: AppColors.border,
+    borderColor: colors.border,
     borderRadius: 12,
     paddingHorizontal: 15,
     paddingVertical: 12,
     fontSize: 16,
-    color: AppColors.text,
+    color: colors.text,
   },
   loginButton: {
-    backgroundColor: AppColors.primary,
+    backgroundColor: colors.primary,
     borderRadius: 12,
     paddingVertical: 15,
     alignItems: 'center',
     marginTop: 10,
-    shadowColor: AppColors.primary,
+    shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 4,
   },
   loginButtonText: {
-    color: AppColors.background,
+    color: colors.background,
     fontSize: 18,
     fontWeight: '700',
   },
   demoNote: {
     marginTop: 30,
     padding: 15,
-    backgroundColor: AppColors.cardDark,
+    backgroundColor: colors.cardDark,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: AppColors.border,
+    borderColor: colors.border,
   },
   demoText: {
-    color: AppColors.accent,
+    color: colors.accent,
     textAlign: 'center',
     fontSize: 14,
     fontStyle: 'italic',

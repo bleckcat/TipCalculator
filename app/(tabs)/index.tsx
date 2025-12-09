@@ -1,5 +1,6 @@
-import { AppColors } from '@/constants/theme';
+import { getThemeColors } from '@/constants/theme';
 import { useApp } from '@/context/AppContext';
+import { useTheme } from '@/hooks/use-theme';
 import { CalculationStaff, DEFAULT_ROLES, Staff } from '@/types';
 import { calculateTips, formatCurrency, generateTipCalculationId } from '@/utils/tipCalculations';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -17,6 +18,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 export default function CalculateTipScreen() {
   const { state, addTipCalculation } = useApp();
+  const { colors } = useTheme();
   const [totalAmount, setTotalAmount] = useState('');
   const [amountError, setAmountError] = useState('');
   const [mealPeriod, setMealPeriod] = useState<'lunch' | 'dinner'>('dinner');
@@ -34,6 +36,8 @@ export default function CalculateTipScreen() {
     pool2BaseAmount: number;
     pool2ExtraAmount: number;
   } | null>(null);
+
+  const styles = createStyles(colors);
 
   const handleAmountChange = (text: string) => {
     // Remove any non-numeric characters
@@ -188,10 +192,10 @@ export default function CalculateTipScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Calculate Tips</Text>
+        <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: colors.border }]}>
+          <Text style={[styles.title, { color: colors.text }]}>Calculate Tips</Text>
         </View>
 
         <View style={styles.section}>
@@ -438,10 +442,9 @@ export default function CalculateTipScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ReturnType<typeof getThemeColors>) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: AppColors.background,
   },
   scrollView: {
     flex: 1,
@@ -452,17 +455,17 @@ const styles = StyleSheet.create({
   header: {
     paddingHorizontal: 20,
     paddingVertical: 20,
-    backgroundColor: AppColors.card,
+    backgroundColor: colors.card,
     borderBottomWidth: 1,
-    borderBottomColor: AppColors.border,
+    borderBottomColor: colors.border,
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: AppColors.text,
+    color: colors.text,
   },
   section: {
-    backgroundColor: AppColors.card,
+    backgroundColor: colors.card,
     marginTop: 10,
     paddingHorizontal: 20,
     paddingVertical: 20,
@@ -472,7 +475,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: AppColors.text,
+    color: colors.text,
     marginBottom: 15,
   },
   mealPeriodContainer: {
@@ -485,34 +488,34 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: AppColors.border,
-    backgroundColor: AppColors.background,
+    borderColor: colors.border,
+    backgroundColor: colors.background,
     alignItems: 'center',
   },
   mealPeriodButtonActive: {
-    borderColor: AppColors.primary,
-    backgroundColor: AppColors.primary,
+    borderColor: colors.primary,
+    backgroundColor: colors.primary,
   },
   mealPeriodText: {
     fontSize: 16,
     fontWeight: '600',
-    color: AppColors.textSecondary,
+    color: colors.textSecondary,
   },
   mealPeriodTextActive: {
-    color: AppColors.background,
+    color: colors.background,
   },
   mealPeriodButtonDisabled: {
-    backgroundColor: AppColors.border,
-    borderColor: AppColors.border,
+    backgroundColor: colors.border,
+    borderColor: colors.border,
     opacity: 0.5,
   },
   mealPeriodTextDisabled: {
-    color: AppColors.textMuted,
+    color: colors.textMuted,
   },
   datePickerButton: {
-    backgroundColor: AppColors.background,
+    backgroundColor: colors.background,
     borderWidth: 2,
-    borderColor: AppColors.border,
+    borderColor: colors.border,
     borderRadius: 12,
     paddingVertical: 14,
     paddingHorizontal: 20,
@@ -520,18 +523,18 @@ const styles = StyleSheet.create({
   datePickerText: {
     fontSize: 16,
     fontWeight: '600',
-    color: AppColors.text,
+    color: colors.text,
     textAlign: 'center',
   },
   searchInput: {
-    backgroundColor: AppColors.background,
+    backgroundColor: colors.background,
     borderWidth: 2,
-    borderColor: AppColors.border,
+    borderColor: colors.border,
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 12,
     fontSize: 16,
-    color: AppColors.text,
+    color: colors.text,
     marginBottom: 12,
   },
   filterContainer: {
@@ -541,17 +544,17 @@ const styles = StyleSheet.create({
   filterChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: AppColors.background,
+    backgroundColor: colors.background,
     borderWidth: 2,
-    borderColor: AppColors.border,
+    borderColor: colors.border,
     borderRadius: 20,
     paddingVertical: 8,
     paddingHorizontal: 16,
     marginRight: 10,
   },
   filterChipActive: {
-    backgroundColor: AppColors.primary,
-    borderColor: AppColors.primary,
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
   },
   filterChipDot: {
     width: 10,
@@ -562,10 +565,10 @@ const styles = StyleSheet.create({
   filterChipText: {
     fontSize: 14,
     fontWeight: '600',
-    color: AppColors.text,
+    color: colors.text,
   },
   filterChipTextActive: {
-    color: AppColors.background,
+    color: colors.background,
   },
   poolHeader: {
     flexDirection: 'row',
@@ -577,45 +580,45 @@ const styles = StyleSheet.create({
   poolTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: AppColors.textSecondary,
+    color: colors.textSecondary,
   },
   poolAmount: {
     fontSize: 12,
-    color: AppColors.textMuted,
+    color: colors.textMuted,
     fontWeight: '500',
   },
   poolDivider: {
     height: 1,
-    backgroundColor: AppColors.border,
+    backgroundColor: colors.border,
     marginVertical: 20,
   },
   pool2ExtraInfo: {
-    backgroundColor: AppColors.background,
+    backgroundColor: colors.background,
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: 8,
     marginBottom: 12,
     borderLeftWidth: 3,
-    borderLeftColor: AppColors.primary,
+    borderLeftColor: colors.primary,
   },
   pool2ExtraText: {
     fontSize: 12,
-    color: AppColors.primary,
+    color: colors.primary,
     fontWeight: '600',
   },
   amountInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: AppColors.background,
+    backgroundColor: colors.background,
     borderWidth: 2,
-    borderColor: AppColors.border,
+    borderColor: colors.border,
     borderRadius: 12,
     paddingHorizontal: 16,
   },
   dollarSign: {
     fontSize: 24,
     fontWeight: '700',
-    color: AppColors.textSecondary,
+    color: colors.textSecondary,
     marginRight: 4,
   },
   amountInput: {
@@ -623,21 +626,21 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     fontSize: 24,
     fontWeight: '700',
-    color: AppColors.primary,
+    color: colors.primary,
   },
   inputError: {
-    borderColor: AppColors.error,
+    borderColor: colors.error,
     borderWidth: 2,
   },
   errorText: {
     fontSize: 12,
-    color: AppColors.error,
+    color: colors.error,
     marginTop: 6,
     fontWeight: '600',
   },
   helperText: {
     fontSize: 12,
-    color: AppColors.textMuted,
+    color: colors.textMuted,
     marginTop: 6,
   },
   staffList: {
@@ -650,15 +653,15 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 18,
     marginBottom: 10,
-    backgroundColor: AppColors.background,
+    backgroundColor: colors.background,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: AppColors.border,
+    borderColor: colors.border,
   },
   selectedStaffItem: {
-    backgroundColor: AppColors.background,
-    borderColor: AppColors.primary,
-    shadowColor: AppColors.primary,
+    backgroundColor: colors.background,
+    borderColor: colors.primary,
+    shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
@@ -670,20 +673,20 @@ const styles = StyleSheet.create({
   staffName: {
     fontSize: 17,
     fontWeight: '600',
-    color: AppColors.text,
+    color: colors.text,
     marginBottom: 6,
   },
   staffRole: {
     fontSize: 14,
-    color: AppColors.textSecondary,
+    color: colors.textSecondary,
     marginBottom: 4,
   },
   basePercentage: {
     fontSize: 12,
-    color: AppColors.textMuted,
+    color: colors.textMuted,
   },
   selectedText: {
-    color: AppColors.primary,
+    color: colors.primary,
   },
   roleIndicator: {
     width: 24,
@@ -698,12 +701,12 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
-    color: AppColors.textSecondary,
+    color: colors.textSecondary,
     marginBottom: 8,
   },
   emptySubtext: {
     fontSize: 14,
-    color: AppColors.textMuted,
+    color: colors.textMuted,
   },
   calculationHeader: {
     flexDirection: 'row',
@@ -712,26 +715,26 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   warningBadge: {
-    backgroundColor: AppColors.warning,
+    backgroundColor: colors.warning,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 8,
   },
   warningText: {
-    color: AppColors.background,
+    color: colors.background,
     fontSize: 11,
     fontWeight: 'bold',
   },
   warningMessage: {
-    backgroundColor: AppColors.background,
+    backgroundColor: colors.background,
     padding: 16,
     borderRadius: 12,
     marginBottom: 15,
     borderWidth: 2,
-    borderColor: AppColors.warning,
+    borderColor: colors.warning,
   },
   warningMessageText: {
-    color: AppColors.warning,
+    color: colors.warning,
     fontSize: 14,
   },
   calculationList: {
@@ -744,15 +747,15 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 18,
     marginBottom: 10,
-    backgroundColor: AppColors.background,
+    backgroundColor: colors.background,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: AppColors.border,
+    borderColor: colors.border,
   },
   adjustedItem: {
-    backgroundColor: AppColors.background,
+    backgroundColor: colors.background,
     borderWidth: 2,
-    borderColor: AppColors.warning,
+    borderColor: colors.warning,
   },
   calculationInfo: {
     flex: 1,
@@ -760,25 +763,25 @@ const styles = StyleSheet.create({
   calculationName: {
     fontSize: 17,
     fontWeight: '600',
-    color: AppColors.text,
+    color: colors.text,
     marginBottom: 4,
   },
   calculationRole: {
     fontSize: 14,
-    color: AppColors.textSecondary,
+    color: colors.textSecondary,
     marginBottom: 4,
   },
   calculationPercentage: {
     fontSize: 12,
-    color: AppColors.textMuted,
+    color: colors.textMuted,
   },
   adjustedText: {
-    color: AppColors.warning,
+    color: colors.warning,
   },
   calculationAmount: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: AppColors.primary,
+    color: colors.primary,
   },
   totalRow: {
     flexDirection: 'row',
@@ -787,17 +790,17 @@ const styles = StyleSheet.create({
     paddingVertical: 18,
     marginTop: 10,
     borderTopWidth: 2,
-    borderTopColor: AppColors.border,
+    borderTopColor: colors.border,
   },
   totalLabel: {
     fontSize: 19,
     fontWeight: '700',
-    color: AppColors.text,
+    color: colors.text,
   },
   totalAmount: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: AppColors.primary,
+    color: colors.primary,
   },
   undistributedRow: {
     flexDirection: 'row',
@@ -805,21 +808,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     marginTop: 8,
-    backgroundColor: AppColors.background,
+    backgroundColor: colors.background,
     borderRadius: 8,
     paddingHorizontal: 12,
     borderWidth: 1,
-    borderColor: AppColors.warning,
+    borderColor: colors.warning,
   },
   undistributedLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: AppColors.textSecondary,
+    color: colors.textSecondary,
   },
   undistributedAmount: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: AppColors.warning,
+    color: colors.warning,
   },
   actionButtonsContainer: {
     flexDirection: 'row',
@@ -828,7 +831,7 @@ const styles = StyleSheet.create({
   },
   exportButton: {
     flex: 1,
-    backgroundColor: AppColors.secondary || '#6C757D',
+    backgroundColor: colors.secondary || '#6C757D',
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
@@ -839,41 +842,41 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   exportButtonDisabled: {
-    backgroundColor: AppColors.border,
+    backgroundColor: colors.border,
     shadowOpacity: 0,
     elevation: 0,
   },
   exportButtonText: {
-    color: AppColors.background,
+    color: colors.background,
     fontSize: 16,
     fontWeight: '600',
   },
   exportButtonTextDisabled: {
-    color: AppColors.textMuted,
+    color: colors.textMuted,
   },
   saveButton: {
     flex: 1,
-    backgroundColor: AppColors.primary,
+    backgroundColor: colors.primary,
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
-    shadowColor: AppColors.primary,
+    shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.4,
     shadowRadius: 8,
     elevation: 4,
   },
   saveButtonDisabled: {
-    backgroundColor: AppColors.border,
+    backgroundColor: colors.border,
     shadowOpacity: 0,
     elevation: 0,
   },
   saveButtonText: {
-    color: AppColors.background,
+    color: colors.background,
     fontSize: 18,
     fontWeight: '700',
   },
   saveButtonTextDisabled: {
-    color: AppColors.textMuted,
+    color: colors.textMuted,
   },
 });

@@ -1,17 +1,20 @@
-import { AppColors } from '@/constants/theme';
+import { getThemeColors } from '@/constants/theme';
 import { useApp } from '@/context/AppContext';
+import { useTheme } from '@/hooks/use-theme';
 import React from 'react';
 import {
-  Alert,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    Alert,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function UserScreen() {
   const { state, logout } = useApp();
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
 
   const handleLogout = () => {
     Alert.alert(
@@ -83,22 +86,22 @@ export default function UserScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ReturnType<typeof getThemeColors>) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: AppColors.background,
+    backgroundColor: colors.background,
   },
   header: {
     paddingHorizontal: 20,
     paddingVertical: 15,
-    backgroundColor: AppColors.card,
+    backgroundColor: colors.card,
     borderBottomWidth: 1,
-    borderBottomColor: AppColors.border,
+    borderBottomColor: colors.border,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: AppColors.text,
+    color: colors.text,
   },
   content: {
     flex: 1,
@@ -106,7 +109,7 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   profileSection: {
-    backgroundColor: AppColors.card,
+    backgroundColor: colors.card,
     borderRadius: 12,
     padding: 30,
     alignItems: 'center',
@@ -122,7 +125,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: AppColors.primary,
+    backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 15,
@@ -135,15 +138,15 @@ const styles = StyleSheet.create({
   username: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: AppColors.text,
+    color: colors.text,
     marginBottom: 5,
   },
   userRole: {
     fontSize: 16,
-    color: AppColors.textSecondary,
+    color: colors.textSecondary,
   },
   statsSection: {
-    backgroundColor: AppColors.card,
+    backgroundColor: colors.card,
     borderRadius: 12,
     padding: 20,
     marginBottom: 20,
@@ -161,16 +164,16 @@ const styles = StyleSheet.create({
   statNumber: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: AppColors.primary,
+    color: colors.primary,
     marginBottom: 5,
   },
   statLabel: {
     fontSize: 12,
-    color: AppColors.textSecondary,
+    color: colors.textSecondary,
     textAlign: 'center',
   },
   actionsSection: {
-    backgroundColor: AppColors.card,
+    backgroundColor: colors.card,
     borderRadius: 12,
     padding: 20,
     marginBottom: 20,
@@ -183,20 +186,20 @@ const styles = StyleSheet.create({
   actionItem: {
     paddingVertical: 15,
     borderBottomWidth: 1,
-    borderBottomColor: AppColors.border,
+    borderBottomColor: colors.border,
   },
   actionText: {
     fontSize: 16,
     fontWeight: '600',
-    color: AppColors.text,
+    color: colors.text,
     marginBottom: 5,
   },
   actionSubtext: {
     fontSize: 14,
-    color: AppColors.textSecondary,
+    color: colors.textSecondary,
   },
   logoutButton: {
-    backgroundColor: AppColors.error,
+    backgroundColor: colors.error,
     borderRadius: 8,
     paddingVertical: 15,
     alignItems: 'center',
