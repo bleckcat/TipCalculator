@@ -4,6 +4,7 @@ import { useTheme } from '@/hooks/use-theme';
 import { TipCalculation } from "@/types";
 import { generateTipsPDF } from "@/utils/pdfGenerator";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from "react";
 import {
     Alert,
@@ -18,6 +19,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function HistoryScreen() {
   const { state, removeTipCalculation } = useApp();
   const { colors } = useTheme();
+  const router = useRouter();
   const [selectedCalculation, setSelectedCalculation] =
     useState<TipCalculation | null>(null);
 
@@ -53,6 +55,19 @@ export default function HistoryScreen() {
           },
         ]
       );
+    }
+  };
+
+  const handleEdit = () => {
+    if (selectedCalculation) {
+      setSelectedCalculation(null);
+      // Navigate to index tab with edit state
+      router.push({
+        pathname: '/(tabs)',
+        params: {
+          editCalculationId: selectedCalculation.id,
+        }
+      });
     }
   };
 
@@ -247,13 +262,23 @@ export default function HistoryScreen() {
                 ))}
               </View>
 
-              <TouchableOpacity
-                style={styles.deleteButton}
-                onPress={handleDelete}
-              >
-                <MaterialIcons name="delete" size={18} color="#fff" style={{ marginRight: 6 }} />
-                <Text style={styles.deleteButtonText}>Delete Calculation</Text>
-              </TouchableOpacity>
+              <View style={styles.modalActions}>
+                <TouchableOpacity
+                  style={styles.editButton}
+                  onPress={handleEdit}
+                >
+                  <MaterialIcons name="edit" size={18} color="#fff" style={{ marginRight: 6 }} />
+                  <Text style={styles.editButtonText}>Edit Calculation</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.deleteButton}
+                  onPress={handleDelete}
+                >
+                  <MaterialIcons name="delete" size={18} color="#fff" style={{ marginRight: 6 }} />
+                  <Text style={styles.deleteButtonText}>Delete Calculation</Text>
+                </TouchableOpacity>
+              </View>
             </ScrollView>
           </View>
         </View>
@@ -501,11 +526,31 @@ const createStyles = (colors: ReturnType<typeof getThemeColors>) => StyleSheet.c
     fontWeight: "600",
     color: colors.primary,
   },
-  deleteButton: {
-    backgroundColor: colors.error,
+  modalActions: {
+    flexDirection: 'row',
     marginHorizontal: 20,
     marginTop: 15,
     marginBottom: 5,
+    gap: 10,
+  },
+  editButton: {
+    flex: 1,
+    backgroundColor: colors.primary,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 6,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  editButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  deleteButton: {
+    flex: 1,
+    backgroundColor: colors.error,
     paddingVertical: 10,
     paddingHorizontal: 16,
     borderRadius: 6,

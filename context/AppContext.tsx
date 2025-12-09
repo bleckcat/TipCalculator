@@ -18,6 +18,7 @@ interface AppContextType {
   updateStaff: (staff: Staff) => void;
   removeStaff: (staffId: string) => void;
   addTipCalculation: (calculation: TipCalculation) => void;
+  updateTipCalculation: (calculation: TipCalculation) => void;
   removeTipCalculation: (calculationId: string) => void;
   getRoles: () => StaffRole[];
   toggleTheme: () => void;
@@ -30,6 +31,7 @@ type AppAction =
   | { type: 'UPDATE_STAFF'; payload: Staff }
   | { type: 'REMOVE_STAFF'; payload: string }
   | { type: 'ADD_TIP_CALCULATION'; payload: TipCalculation }
+  | { type: 'UPDATE_TIP_CALCULATION'; payload: TipCalculation }
   | { type: 'REMOVE_TIP_CALCULATION'; payload: string }
   | { type: 'LOAD_STATE'; payload: Partial<AppState> }
   | { type: 'TOGGLE_THEME' };
@@ -77,6 +79,13 @@ function appReducer(state: AppState, action: AppAction): AppState {
       return {
         ...state,
         tipCalculations: [...state.tipCalculations, action.payload],
+      };
+    case 'UPDATE_TIP_CALCULATION':
+      return {
+        ...state,
+        tipCalculations: state.tipCalculations.map(c => 
+          c.id === action.payload.id ? action.payload : c
+        ),
       };
     case 'REMOVE_TIP_CALCULATION':
       return {
@@ -187,6 +196,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: 'ADD_TIP_CALCULATION', payload: calculation });
   };
 
+  const updateTipCalculation = (calculation: TipCalculation) => {
+    dispatch({ type: 'UPDATE_TIP_CALCULATION', payload: calculation });
+  };
+
   const removeTipCalculation = (calculationId: string) => {
     console.log('Removing calculation with ID:', calculationId);
     console.log('Current calculations:', state.tipCalculations.map(c => c.id));
@@ -208,6 +221,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       updateStaff,
       removeStaff,
       addTipCalculation,
+      updateTipCalculation,
       removeTipCalculation,
       getRoles,
       toggleTheme,

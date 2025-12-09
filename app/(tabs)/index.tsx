@@ -4,21 +4,27 @@ import { useTheme } from '@/hooks/use-theme';
 import { CalculationStaff, DEFAULT_ROLES, Staff } from '@/types';
 import { calculateTips, formatCurrency, generateTipCalculationId } from '@/utils/tipCalculations';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
-  Alert,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    Alert,
+    Platform,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 export default function CalculateTipScreen() {
-  const { state, addTipCalculation } = useApp();
+  const { state, addTipCalculation, updateTipCalculation } = useApp();
   const { colors } = useTheme();
+  const params = useLocalSearchParams();
+  const router = useRouter();
+  const navigation = useNavigation();
+  const [editMode, setEditMode] = useState(false);
+  const [editCalculationId, setEditCalculationId] = useState<string | null>(null);
   const [totalAmount, setTotalAmount] = useState('');
   const [amountError, setAmountError] = useState('');
   const [mealPeriod, setMealPeriod] = useState<'lunch' | 'dinner'>('dinner');
@@ -38,6 +44,28 @@ export default function CalculateTipScreen() {
   } | null>(null);
 
   const styles = createStyles(colors);
+
+  // Handle edit mode - load calculation data when editCalculationId is provided
+  useEffect(() => {
+    if (params.editCalculationId && typeof params.editCalculationId === 'string') {
+      const calculationToEdit = state.tipCalculations.find(
+        c => c.id === params.editCalculationId
+      );
+      
+      if (calculationToEdit && !editMode) {
+        setEditMode(true);
+        setEditCalculationId(calculationToEdit.id);
+        setTotalAmount(calculationToEdit.totalTipAmount.toFixed(2));
+        setMealPeriod(calculationToEdit.mealPeriod);
+        setSelectedDate(new Date(calculationToEdit.date));
+        setSelectedStaffIds(calculationToEdit.staffMembers.map(sm => sm.staffId));
+      }
+    } else if (!params.editCalculationId && editMode) {
+      // Clear edit mode when params are cleared
+      setEditMode(false);
+      setEditCalculationId(null);
+    }
+  }, [params.editCalculationId, editMode]);
 
   const handleAmountChange = (text: string) => {
     // Remove any non-numeric characters
@@ -127,7 +155,7 @@ export default function CalculateTipScreen() {
     }
 
     const calculation = {
-      id: generateTipCalculationId(),
+      id: editMode && editCalculationId ? editCalculationId : generateTipCalculationId(),
       date: selectedDate.toISOString(),
       mealPeriod,
       totalTipAmount: parseFloat(totalAmount),
@@ -136,15 +164,32 @@ export default function CalculateTipScreen() {
       undistributedAmount: calculationResult.undistributedAmount,
     };
 
-    addTipCalculation(calculation);
-    
-    // Reset form
-    setTotalAmount('');
-    setSelectedStaffIds([]);
-    setCalculationResult(null);
-    setSelectedDate(new Date());
-    
-    Alert.alert('Success', 'Tip calculation saved successfully!');
+    if (editMode && editCalculationId) {
+      updateTipCalculation(calculation);
+      
+      // Exit edit mode and reset form
+      setEditMode(false);
+      setEditCalculationId(null);
+      setTotalAmount('');
+      setSelectedStaffIds([]);
+      setCalculationResult(null);
+      setSelectedDate(new Date());
+      
+      // Clear the edit params by replacing with no params
+      router.setParams({ editCalculationId: undefined });
+      
+      Alert.alert('Success', 'Tip calculation updated successfully!');
+    } else {
+      addTipCalculation(calculation);
+      
+      // Reset form
+      setTotalAmount('');
+      setSelectedStaffIds([]);
+      setCalculationResult(null);
+      setSelectedDate(new Date());
+      
+      Alert.alert('Success', 'Tip calculation saved successfully!');
+    }
   };
 
   const renderStaffItem = ({ item }: { item: Staff }) => {
@@ -195,7 +240,27 @@ export default function CalculateTipScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: colors.border }]}>
-          <Text style={[styles.title, { color: colors.text }]}>Calculate Tips</Text>
+          <View style={styles.headerContent}>
+            <Text style={[styles.title, { color: colors.text }]}>
+              {editMode ? 'Edit Tip Calculation' : 'Calculate Tips'}
+            </Text>
+            {editMode && (
+              <TouchableOpacity
+                style={styles.cancelEditButton}
+                onPress={() => {
+                  setEditMode(false);
+                  setEditCalculationId(null);
+                  setTotalAmount('');
+                  setSelectedStaffIds([]);
+                  setCalculationResult(null);
+                  setSelectedDate(new Date());
+                  router.replace('/(tabs)');
+                }}
+              >
+                <Text style={styles.cancelEditButtonText}>Cancel</Text>
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
 
         <View style={styles.section}>
@@ -433,7 +498,7 @@ export default function CalculateTipScreen() {
               <Text style={[
                 styles.saveButtonText,
                 (!isAmountValid || !calculationResult) && styles.saveButtonTextDisabled
-              ]}>Save Calculation</Text>
+              ]}>{editMode ? 'Update Calculation' : 'Save Calculation'}</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -459,10 +524,26 @@ const createStyles = (colors: ReturnType<typeof getThemeColors>) => StyleSheet.c
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
+  headerContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
     color: colors.text,
+  },
+  cancelEditButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+    backgroundColor: colors.error,
+  },
+  cancelEditButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
   },
   section: {
     backgroundColor: colors.card,
